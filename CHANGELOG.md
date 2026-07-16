@@ -9,6 +9,49 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.6.0] - 2026-07-16 — Claude (asistencia)
+
+### AÑADIDO — Soporte multi-planta (Vigo + MAC) en el flujo C-DPV
+- Proyecto puesto bajo **git** (commits por hito; antes no había control de versiones).
+- Nueva abstracción de planta en `Services/Plants/`:
+  - `PlantDefinition` (raíz SharePoint, formato de chasis/VIN, palabras clave de
+    motor, modelo Vosk, comandos de voz, lista de resultados, GPS simulado).
+  - `PlantRegistry` (VIGO con los valores exactos anteriores; MAC nueva) y
+    `PlantContext` (planta activa; por defecto Vigo).
+- Todos los valores que estaban repartidos por el código (rutas
+  `02_Datos_App_SCA/...`, regex de chasis, `model_es.zip`, palabras
+  termic/hibrid/electr, comandos de voz, GPS simulado de RRU en Windows) ahora
+  se leen de `PlantContext.Current`. Con Vigo activo el comportamiento es
+  idéntico al anterior.
+- Nueva `Pages/PlantSelectionPage`: al pulsar **C-DPV** se elige la planta
+  (VIGO / MAC). El resto de modos (Japón, DPV, Formación, RRU) siguen siendo
+  solo Vigo: `AuditModePage` resetea la planta al aparecer.
+- Al elegir una planta distinta se recarga `Vehiculos.xlsx` desde su carpeta
+  (MAC: modelos **WD** y **WL**, motores **GAS** e **Hybrid**).
+- Planta MAC: VIN ISO de **17 caracteres** (`^[A-HJ-NPR-Z0-9]{17}$`), contenido
+  en inglés, comandos de voz en inglés (next/back/pause/repeat) con nuevo modelo
+  Vosk `Resources/Raw/model_en.zip` (vosk-model-small-en-us-0.15, +40 MB de APK).
+- Creada estructura en SharePoint `02_Datos_App_MAC/` (01_Usuarios,
+  02_Configuraciones, 03_Documentos_pdf, 05_CDPV_Formacion, 09_Capturas) con
+  Excels esqueleto subidos (mismas cabeceras que Vigo; filas de ejemplo "SAMPLE"
+  en CDPV.xlsx a sustituir por el contenido real). Copia local en
+  `_ExcelSharePoint/MAC/`.
+- La copia de seguridad de auditoría (`AutoGuardadoService`) guarda ahora la
+  planta activa y la restaura al recuperar.
+- Usuario de pruebas MAC **sam / admin** inyectado en LoginPage
+  (> eliminar antes de producción, igual que admin/admin).
+- Documentación nueva en `docs/` (arquitectura, flujo de datos, acoplamientos
+  de Vigo, plan MAC).
+
+### PENDIENTE
+- Id real de la lista de resultados por planta (`PlantDefinition.ResultsListId`
+  está vacío para ambas; el envío de resultados ya fallaba antes por esto).
+- Contenido real de CDPV MAC (fases, pasos, coordenadas GPS de la pista MAC).
+- Decidir mensajes de ayuda de formato de VIN por planta (el aviso de formato
+  sigue describiendo el formato de Vigo).
+
+---
+
 ## [1.4.0] - 2026-07-13 — Claude (asistencia)
 
 ### AÑADIDO — Traducción completa del contenido SCA (CDPV)
