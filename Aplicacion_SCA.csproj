@@ -124,6 +124,9 @@
 	  <MauiXaml Update="Pages\MenuEstandarPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\PlantSelectionPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\ResultsJapon.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

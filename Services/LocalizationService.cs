@@ -43,6 +43,32 @@ namespace Aplicacion_SCA.Services
 
         private static readonly Dictionary<string, Dictionary<Language, string>> Translations = new()
         {
+            // PlantSelectionPage
+            { "PLANT_SELECT_TITLE", new() {
+                { Language.Spanish, "SELECCIONA LA PLANTA" },
+                { Language.English, "SELECT PLANT" },
+                { Language.French, "SÉLECTIONNEZ L'USINE" },
+                { Language.German, "WERK AUSWÄHLEN" }
+            } },
+            { "PLANT_SELECT_SUBTITLE", new() {
+                { Language.Spanish, "Elige la planta cuya auditoría C-DPV quieres realizar" },
+                { Language.English, "Choose the plant whose C-DPV audit you want to run" },
+                { Language.French, "Choisissez l'usine dont vous souhaitez réaliser l'audit C-DPV" },
+                { Language.German, "Wählen Sie das Werk, dessen C-DPV-Audit Sie durchführen möchten" }
+            } },
+            { "MSG_CARGANDO_VEHICULOS", new() {
+                { Language.Spanish, "Cargando vehículos de la planta..." },
+                { Language.English, "Loading plant vehicles..." },
+                { Language.French, "Chargement des véhicules de l'usine..." },
+                { Language.German, "Fahrzeuge des Werks werden geladen..." }
+            } },
+            { "ERR_VEHICULOS_PLANTA", new() {
+                { Language.Spanish, "No se pudieron descargar los vehículos de esta planta. Comprueba que exista el archivo Vehiculos.xlsx en su carpeta de SharePoint." },
+                { Language.English, "Could not download this plant's vehicles. Check that Vehiculos.xlsx exists in its SharePoint folder." },
+                { Language.French, "Impossible de télécharger les véhicules de cette usine. Vérifiez que Vehiculos.xlsx existe dans son dossier SharePoint." },
+                { Language.German, "Die Fahrzeuge dieses Werks konnten nicht heruntergeladen werden. Prüfen Sie, ob Vehiculos.xlsx im SharePoint-Ordner vorhanden ist." }
+            } },
+
             // MainPage
             { "MAIN_TITLE", new() { 
                 { Language.Spanish, "SISTEMA DE CONTROL DE AUDITORÍA" }, 
