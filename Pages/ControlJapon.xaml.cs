@@ -1,4 +1,5 @@
 ﻿using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using Aplicacion_SCA.Models;
 using System.Threading;
 using System.Linq;
@@ -50,10 +51,10 @@ public partial class ControlJapon : ContentPage
     private IAudioCaptureService? _audioService;
 
     private List<string> _listaPdfsDisponibles = new List<string>();
-    private readonly string _rutaAudioJapon = "02_Datos_App_SCA/04_Control_Japon/AudioJapon.xlsx";
-    private readonly string _rutaCheckListJapon = "02_Datos_App_SCA/04_Control_Japon/CheckListJapon.xlsx";
-    private readonly string _carpetaImagenes = "02_Datos_App_SCA/04_Control_Japon/Imagenes";
-    private readonly string _carpetaManualesPdf = "02_Datos_App_SCA/03_Documentos_pdf";
+    private static string _rutaAudioJapon => PlantContext.ResolvePath("04_Control_Japon/AudioJapon.xlsx");
+    private static string _rutaCheckListJapon => PlantContext.ResolvePath("04_Control_Japon/CheckListJapon.xlsx");
+    private static string _carpetaImagenes => PlantContext.ResolvePath("04_Control_Japon/Imagenes");
+    private static string _carpetaManualesPdf => PlantContext.ResolvePath("03_Documentos_pdf");
 
     private string ClaveGuardadoPaso => $"PasoGuardadoJapon_{SesionGlobal.ChasisActual ?? "NA"}";
 

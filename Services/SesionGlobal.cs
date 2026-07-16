@@ -72,6 +72,7 @@ public static class SesionGlobal
 
     public static void CerrarSesion()
     {
+        Plants.PlantContext.Reset();
         UsuarioActivo = null;
         ChasisActual = null;
         ModoSeleccionado = string.Empty;

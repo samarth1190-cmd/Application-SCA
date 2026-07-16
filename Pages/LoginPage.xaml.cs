@@ -1,5 +1,6 @@
 using Aplicacion_SCA.Models;
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using ClosedXML.Excel;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
@@ -37,6 +38,20 @@ public partial class LoginPage : ContentPage
                 APELLIDOS = "Local",
                 ROL = "Admin",
                 TURNO = "C"
+            });
+        }
+
+        // Usuario de pruebas para la planta MAC (eliminar antes de producción).
+        if (!SesionGlobal.ListaUsuarios.Any(u => u.CV.Equals("sam", StringComparison.OrdinalIgnoreCase)))
+        {
+            SesionGlobal.ListaUsuarios.Add(new Usuario
+            {
+                CV = "sam",
+                PSA = "admin",
+                NOMBRE = "Sam",
+                APELLIDOS = "MAC Test",
+                ROL = "Auditor",
+                TURNO = "A"
             });
         }
 
@@ -168,7 +183,7 @@ public partial class LoginPage : ContentPage
                         var sp = new SharePointService();
                         string token = await sp.ConseguirTokenSilenciosoAsync();
 
-                        byte[] excelBytes = await sp.DescargarExcelConTokenAsync("02_Datos_App_SCA/10_Notificaciones/Notificaciones.xlsx", token);
+                        byte[] excelBytes = await sp.DescargarExcelConTokenAsync(PlantContext.ResolvePath("10_Notificaciones/Notificaciones.xlsx"), token);
 
                         if (excelBytes != null && excelBytes.Length > 0)
                         {

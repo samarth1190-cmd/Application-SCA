@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using Aplicacion_SCA.Models;
 using System;
 using System.Threading.Tasks;
@@ -29,9 +30,9 @@ public partial class RRUPage : ContentPage
     private readonly string _rutaArchivoRespaldo = System.IO.Path.Combine(FileSystem.AppDataDirectory, "rru_backup.json");
 
     private List<string> _listaPdfsDisponibles = new();
-    private readonly string _carpetaManualesPdf = "02_Datos_App_SCA/03_Documentos_pdf";
+    private static string _carpetaManualesPdf => PlantContext.ResolvePath("03_Documentos_pdf");
 
-    private readonly string _carpetaImagenesRRU = "02_Datos_App_SCA/07_RRU/Imagenes";
+    private static string _carpetaImagenesRRU => PlantContext.ResolvePath("07_RRU/Imagenes");
 
     public RRUPage(string modelo, string motor, string chasis)
     {
@@ -209,8 +210,8 @@ public partial class RRUPage : ContentPage
             Location? location = null;
 
 #if WINDOWS
-            await Task.Delay(1000); 
-            location = new Location(42.2037, -8.7428); 
+            await Task.Delay(1000);
+            location = new Location(PlantContext.Current.SimulatedLatitude, PlantContext.Current.SimulatedLongitude);
 #else
             var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
 

@@ -1,5 +1,6 @@
 using Aplicacion_SCA.Models;
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using System.Threading.Tasks;
 using System;
 using System.IO;
@@ -16,9 +17,9 @@ namespace Aplicacion_SCA.Pages;
 public partial class AuditModePage : ContentPage
 {
     private List<string> _listaPdfsDisponibles = new List<string>();
-    private readonly string _carpetaManualesPdf = "02_Datos_App_SCA/03_Documentos_pdf";
-    private readonly string _carpetaOtrosAuditorias = "02_Datos_App_SCA/08_Otros";
-    private readonly string _carpetaImagenesNotificaciones = "02_Datos_App_SCA/10_Notificaciones/Imagenes";
+    private static string _carpetaManualesPdf => PlantContext.ResolvePath("03_Documentos_pdf");
+    private static string _carpetaOtrosAuditorias => PlantContext.ResolvePath("08_Otros");
+    private static string _carpetaImagenesNotificaciones => PlantContext.ResolvePath("10_Notificaciones/Imagenes");
 
     private bool _isNavegando = false;
     private bool _notificacionCargadaEnUI = false;
@@ -44,6 +45,10 @@ public partial class AuditModePage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
+        // En el menú principal la planta activa siempre vuelve a ser Vigo:
+        // solo el flujo C-DPV (PlantSelectionPage) puede cambiarla.
+        PlantContext.Reset();
 
         _isNavegando = false;
         ApplyTranslations();
@@ -305,7 +310,7 @@ public partial class AuditModePage : ContentPage
         {
             var sp = new SharePointService();
             string token = await sp.ConseguirTokenSilenciosoAsync();
-            string rutaRRU = "02_Datos_App_SCA/07_RRU/RRU.xlsx";
+            string rutaRRU = PlantContext.ResolvePath("07_RRU/RRU.xlsx");
             await sp.DescargarExcelConTokenAsync(rutaRRU, token);
 
             MainThread.BeginInvokeOnMainThread(() => BotonRRU.IsVisible = true);

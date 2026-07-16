@@ -1,5 +1,6 @@
 using Aplicacion_SCA.Models;
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using System.Text.RegularExpressions;
 using System.Text;
 using System;
@@ -386,11 +387,11 @@ public partial class SelectionPage : ContentPage
                                     modo.Contains("SCA", StringComparison.OrdinalIgnoreCase);
 
             if (esModo13Columnas)
-                rutaExcel = "02_Datos_App_SCA/05_CDPV_Formacion/CDPV.xlsx";
+                rutaExcel = PlantContext.ResolvePath("05_CDPV_Formacion/CDPV.xlsx");
             else if (modo.Equals("DPV", StringComparison.OrdinalIgnoreCase))
-                rutaExcel = "02_Datos_App_SCA/06_DPV/DPV.xlsx";
+                rutaExcel = PlantContext.ResolvePath("06_DPV/DPV.xlsx");
             else
-                rutaExcel = $"02_Datos_App_SCA/08_Otros/{modo}.xlsx";
+                rutaExcel = PlantContext.ResolvePath($"08_Otros/{modo}.xlsx");
 
             byte[] excelBytes = await sp.DescargarExcelConTokenAsync(rutaExcel, token);
 
@@ -430,7 +431,7 @@ public partial class SelectionPage : ContentPage
             var excelService = new ExcelService();
             string token = await sp.ConseguirTokenSilenciosoAsync();
 
-            string rutaRRU = "02_Datos_App_SCA/07_RRU/RRU.xlsx";
+            string rutaRRU = PlantContext.ResolvePath("07_RRU/RRU.xlsx");
 
             byte[] excelBytes = await sp.DescargarExcelConTokenAsync(rutaRRU, token);
 

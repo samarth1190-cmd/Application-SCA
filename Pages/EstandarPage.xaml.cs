@@ -1,4 +1,5 @@
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using Aplicacion_SCA.Models;
 using System.Diagnostics;
 using System.Threading;
@@ -45,7 +46,7 @@ public partial class EstandarPage : ContentPage
     private IAudioCaptureService? _audioService;
 
     private List<string> _listaPdfsDisponibles = new List<string>();
-    private readonly string _carpetaManualesPdf = "02_Datos_App_SCA/03_Documentos_pdf";
+    private static string _carpetaManualesPdf => PlantContext.ResolvePath("03_Documentos_pdf");
 
     private string ClaveGuardadoPaso => $"PasoGuardado_{SesionGlobal.ChasisActual ?? "NA"}_{_miIndiceEstandar}";
 
@@ -78,14 +79,14 @@ public partial class EstandarPage : ContentPage
         try
         {
             string cacheDir = FileSystem.CacheDirectory;
-            string modelDestPath = System.IO.Path.Combine(cacheDir, "model_es");
+            string modelDestPath = System.IO.Path.Combine(cacheDir, PlantContext.Current.VoskModelFolder);
 
             if (!Directory.Exists(modelDestPath) || !File.Exists(System.IO.Path.Combine(modelDestPath, "am", "final.mdl")))
             {
                 Debug.WriteLine("⚙️ VOSK: Extrayendo modelo del ZIP...");
                 if (!Directory.Exists(modelDestPath)) Directory.CreateDirectory(modelDestPath);
 
-                using var stream = await FileSystem.OpenAppPackageFileAsync("model_es.zip");
+                using var stream = await FileSystem.OpenAppPackageFileAsync(PlantContext.Current.VoskModelAsset);
                 using var archive = new ZipArchive(stream);
                 archive.ExtractToDirectory(modelDestPath, true);
             }
@@ -322,11 +323,12 @@ public partial class EstandarPage : ContentPage
                 string texto = (_esFormacion ? p.AudioFormacion : p.AudioAuditoria) ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(texto)) return false;
 
+                var kw = PlantContext.Current.MotorKeywords;
                 bool pasoComun = (p.MotorTermico == 0 && p.MotorHibrido == 0 && p.MotorElectrico == 0);
                 bool esParaEsteMotor = pasoComun ||
-                                       (motorElegido.Contains("termic") && p.MotorTermico == 1) ||
-                                       (motorElegido.Contains("hibrid") && p.MotorHibrido == 1) ||
-                                       (motorElegido.Contains("electr") && p.MotorElectrico == 1);
+                                       (kw.Termico.Any(k => motorElegido.Contains(k)) && p.MotorTermico == 1) ||
+                                       (kw.Hibrido.Any(k => motorElegido.Contains(k)) && p.MotorHibrido == 1) ||
+                                       (kw.Electrico.Any(k => motorElegido.Contains(k)) && p.MotorElectrico == 1);
 
                 bool esParaEstaPista = !SesionGlobal.EsRodajeExterior
                                        ? (p.Exterior == 0 || p.Exterior == 1)
@@ -690,25 +692,14 @@ public partial class EstandarPage : ContentPage
 
             Debug.WriteLine($"📝 EVALUANDO [Parcial={esParcial}]: '{texto}'");
 
-            if (texto.Contains("sigue") || texto.Contains("siguiente") || texto.Contains("Continuar"))
+            foreach (var (cmd, palabras) in PlantContext.Current.VoiceCommands)
             {
-                comando = "siguiente";
-                Debug.WriteLine("✅ COMANDO CAZADO: Siguiente");
-            }
-            else if (texto.Contains("atras") || texto.Contains("anterior"))
-            {
-                comando = "atras";
-                Debug.WriteLine("✅ COMANDO CAZADO: Atrás");
-            }
-            else if (texto.Contains("pausa") || texto.Contains("parar"))
-            {
-                comando = "pausa";
-                Debug.WriteLine("✅ COMANDO CAZADO: Pausa");
-            }
-            else if (texto.Contains("repetir"))
-            {
-                comando = "repite";
-                Debug.WriteLine("✅ COMANDO CAZADO: Repetir");
+                if (palabras.Any(p => texto.Contains(p)))
+                {
+                    comando = cmd;
+                    Debug.WriteLine($"✅ COMANDO CAZADO: {cmd}");
+                    break;
+                }
             }
 
             if (!string.IsNullOrEmpty(comando))

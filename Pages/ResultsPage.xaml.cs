@@ -1,5 +1,6 @@
 using Aplicacion_SCA.Models;
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using System.Text.RegularExpressions;
 using System.Text;
 using System;
@@ -38,7 +39,7 @@ public partial class ResultsPage : ContentPage
 
         if (EntryChasisEditar != null)
         {
-            EntryChasisEditar.MaxLength = 8;
+            EntryChasisEditar.MaxLength = PlantContext.Current.ChassisMaxLength;
             EntryChasisEditar.TextChanged += OnChasisTextChanged;
         }
     }
@@ -177,12 +178,13 @@ public partial class ResultsPage : ContentPage
 
         string textoLimpio = e.NewTextValue.ToUpper();
 
-        if (textoLimpio.Length > 8)
+        int maxLen = PlantContext.Current.ChassisMaxLength;
+        if (textoLimpio.Length > maxLen)
         {
-            textoLimpio = textoLimpio.Substring(0, 8);
+            textoLimpio = textoLimpio.Substring(0, maxLen);
         }
 
-        if (Regex.IsMatch(textoLimpio, @"^[A-Z]{2}[0-9]{6}$"))
+        if (Regex.IsMatch(textoLimpio, PlantContext.Current.ChassisPattern))
         {
             EntryChasisEditar.TextColor = Color.FromArgb("#43AAA0");
         }
@@ -222,7 +224,7 @@ public partial class ResultsPage : ContentPage
         {
             string nuevoVin = EntryChasisEditar.Text?.ToUpper().Trim() ?? "";
 
-            if (!string.IsNullOrWhiteSpace(nuevoVin) && !Regex.IsMatch(nuevoVin, @"^[A-Z]{2}[0-9]{6}$"))
+            if (!string.IsNullOrWhiteSpace(nuevoVin) && !Regex.IsMatch(nuevoVin, PlantContext.Current.ChassisPattern))
             {
                 await DisplayAlert(LocalizationService.Translate("ALERT_FORMATO_INVALIDO"), LocalizationService.Translate("ALERT_CHASIS_FORMATO_MSG"), LocalizationService.Translate("BTN_ACEPTAR"));
                 return;
@@ -567,7 +569,7 @@ public partial class ResultsPage : ContentPage
                     {
                         var spConexion = new SharePointService();
                         string nombreArchivo = $"Mapa_{SesionGlobal.ChasisActual}_{DateTime.Now.ToString("dd-MM-yyyy_HHmm")}.png";
-                        enlaceCapturaSharePoint = await spConexion.SubirArchivoADocumentosAsync("02_Datos_App_SCA/09_Capturas", nombreArchivo, imagenMapaBytes);
+                        enlaceCapturaSharePoint = await spConexion.SubirArchivoADocumentosAsync(PlantContext.ResolvePath("09_Capturas"), nombreArchivo, imagenMapaBytes);
                     }
                     catch (Exception)
                     {
@@ -761,7 +763,7 @@ public partial class ResultsPage : ContentPage
         try
         {
             var spConexion = new SharePointService();
-            string listId = "";
+            string listId = PlantContext.Current.ResultsListId;   // una lista por planta (id pendiente)
             await spConexion.InsertarEnListaAsync(listId, payloadJson);
         }
         catch (Exception ex)

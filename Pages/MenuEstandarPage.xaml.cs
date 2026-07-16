@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Microsoft.Maui.Controls;
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using Aplicacion_SCA.Models;
 using System.Threading.Tasks;
 using Microsoft.Maui.ApplicationModel;
@@ -29,7 +30,7 @@ public partial class MenuEstandarPage : ContentPage
     private ObservableCollection<EstandarUIItem> _itemsEstandarVisual = new();
     private List<string> _listaPdfsDisponibles = new List<string>();
 
-    private readonly string _carpetaManualesPdf = "02_Datos_App_SCA/03_Documentos_pdf";
+    private static string _carpetaManualesPdf => PlantContext.ResolvePath("03_Documentos_pdf");
 
     public MenuEstandarPage(string modelo, string motor, string modo)
     {
@@ -402,7 +403,7 @@ public partial class MenuEstandarPage : ContentPage
             OcultarTeclado();
             if (sender is Border border) { await border.ScaleTo(0.95, 50); await border.ScaleTo(1.0, 50); }
 
-            if (string.IsNullOrWhiteSpace(SesionGlobal.ChasisActual) || SesionGlobal.ChasisActual.Length < 6)
+            if (string.IsNullOrWhiteSpace(SesionGlobal.ChasisActual) || SesionGlobal.ChasisActual.Length < PlantContext.Current.ChassisMinLength)
             {
                 await DisplayAlert(LocalizationService.Translate("ALERT_FALTA_CHASIS"), LocalizationService.Translate("ALERT_FALTA_CHASIS_MSG"), LocalizationService.Translate("BTN_ENTENDIDO_OK"));
                 _isNavegando = false;

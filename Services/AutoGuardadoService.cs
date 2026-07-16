@@ -11,6 +11,8 @@ namespace Aplicacion_SCA.Services
 {
     public class EstadoAuditoriaBackup
     {
+        // Planta activa cuando se hizo la copia (backups antiguos: null → Vigo).
+        public string? PlantCode { get; set; }
         public Usuario? UsuarioActivo { get; set; }
         public string? ChasisActual { get; set; }
         public string MotorSeleccionado { get; set; } = string.Empty;
@@ -44,6 +46,7 @@ namespace Aplicacion_SCA.Services
             {
                 var backup = new EstadoAuditoriaBackup
                 {
+                    PlantCode = Plants.PlantContext.Current.Code,
                     UsuarioActivo = SesionGlobal.UsuarioActivo,
                     ChasisActual = SesionGlobal.ChasisActual,
                     MotorSeleccionado = SesionGlobal.MotorSeleccionado,
@@ -106,6 +109,7 @@ namespace Aplicacion_SCA.Services
 
                 if (backup != null)
                 {
+                    Plants.PlantContext.SetByCode(backup.PlantCode);
                     SesionGlobal.UsuarioActivo = backup.UsuarioActivo;
                     SesionGlobal.ChasisActual = backup.ChasisActual;
                     SesionGlobal.MotorSeleccionado = backup.MotorSeleccionado;

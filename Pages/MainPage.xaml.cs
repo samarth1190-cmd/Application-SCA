@@ -1,5 +1,6 @@
 using Aplicacion_SCA.Models;
 using Aplicacion_SCA.Services;
+using Aplicacion_SCA.Services.Plants;
 using Microsoft.Maui.Controls;
 using System;
 using System.IO;
@@ -142,8 +143,8 @@ public partial class MainPage : ContentPage
                 var spConexion = new SharePointService();
 
                 string token = await spConexion.ConseguirTokenSilenciosoAsync();
-                string rutaUsuarios = "02_Datos_App_SCA/01_Usuarios/Usuarios.xlsx";
-                string rutaVehiculos = "02_Datos_App_SCA/02_Configuraciones/Vehiculos.xlsx";
+                string rutaUsuarios = PlantContext.ResolvePath("01_Usuarios/Usuarios.xlsx");
+                string rutaVehiculos = PlantContext.ResolvePath("02_Configuraciones/Vehiculos.xlsx");
 
                 var tareaUsuarios = ObtenerArchivoTurboAsync(spConexion, rutaUsuarios, token);
                 var tareaVehiculos = ObtenerArchivoTurboAsync(spConexion, rutaVehiculos, token);
@@ -158,6 +159,7 @@ public partial class MainPage : ContentPage
                 using (var streamVehiculos = tareaVehiculos.Result)
                 {
                     SesionGlobal.ListaVehiculos = excelService.LeerExcelVehiculos(streamVehiculos);
+                    PlantContext.VehiclesLoadedForPlant = PlantContext.Current.Code;
                 }
 
                 SesionGlobal.Estandares?.Clear();
