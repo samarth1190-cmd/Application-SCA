@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+*.user.Backup.tmp
+_APK/
+firma_sca.keystore
+.claude/settings.local.json

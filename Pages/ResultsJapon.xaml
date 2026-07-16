@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Aplicacion_SCA.Pages.ResultsJapon"
+             BackgroundColor="#45728F"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid IgnoreSafeArea="True">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFondoTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border VerticalOptions="Start" HeightRequest="280" StrokeThickness="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,1">
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                    <GradientStop Color="#243782" Offset="0.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,40,40" />
+            </Border.StrokeShape>
+        </Border>
+
+        <Grid RowDefinitions="*" Padding="0,30,0,140">
+
+            <Grid x:Name="ContenedorTarjeta" Grid.Row="0" Margin="25,10,25,-80">
+                <Border BackgroundColor="#FAFAFA" StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="30"/>
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,10" Radius="20" Opacity="0.1" />
+                    </Border.Shadow>
+
+                    <Border.Content>
+                        <ScrollView VerticalScrollBarVisibility="Never">
+                            <ScrollView.Resources>
+                                <DataTemplate x:Key="ItemResultadoTemplate">
+                                    <Border StrokeThickness="0" BackgroundColor="White" Padding="15,12" Margin="0,0,0,10">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Border.Shadow>
+                                            <Shadow Brush="Black" Offset="0,2" Opacity="0.05" Radius="5"/>
+                                        </Border.Shadow>
+                                        <Border.Content>
+                                            <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto" RowSpacing="5" ColumnSpacing="15">
+                                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding Check}" TextColor="#4B5563" FontSize="13" VerticalOptions="Center" LineBreakMode="WordWrap"/>
+                                                <Border Grid.Row="0" Grid.Column="1" HeightRequest="25" WidthRequest="60" StrokeThickness="0" HorizontalOptions="End" VerticalOptions="Center">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="8"/>
+                                                    </Border.StrokeShape>
+                                                    <Border.Content>
+                                                        <Label Text="{Binding Estado}" FontSize="11" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                    </Border.Content>
+                                                    <Border.Triggers>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding Estado}" Value="OK">
+                                                            <Setter Property="BackgroundColor" Value="#28a745" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding Estado}" Value="NOK">
+                                                            <Setter Property="BackgroundColor" Value="#EF4444" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding Estado}" Value="---">
+                                                            <Setter Property="BackgroundColor" Value="#A2ADB9" />
+                                                        </DataTrigger>
+                                                    </Border.Triggers>
+                                                </Border>
+                                                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Observacion}" TextColor="#6B7280" FontSize="12" LineBreakMode="WordWrap" Margin="0,2,0,0">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding Observacion}" Value="">
+                                                            <Setter Property="IsVisible" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding Observacion}" Value="{x:Null}">
+                                                            <Setter Property="IsVisible" Value="False" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                            </Grid>
+                                        </Border.Content>
+                                    </Border>
+                                </DataTemplate>
+                            </ScrollView.Resources>
+
+                            <VerticalStackLayout Padding="20,20,20,50" Spacing="15">
+                                <Border StrokeThickness="2" Padding="20, 5" WidthRequest="250" BackgroundColor="Transparent" HorizontalOptions="Center">
+                                    <Border.Stroke>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#43AAA0" Offset="0.0" />
+                                            <GradientStop Color="#243782" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="45" />
+                                    </Border.StrokeShape>
+                                    <Border.Content>
+                                        <Label Text="RESUMEN INFORME" TextColor="#0F2166" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
+                                    </Border.Content>
+                                </Border>
+
+                                <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="10">
+                                    <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0" VerticalOptions="Center">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="userinforme.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                                            <Label Text="Auditor" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblAuditor" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="calendar.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1">
+                                            <Label Text="Fecha" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblFecha" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="shift.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1">
+                                            <Label Text="Turno" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblTurno" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="timerplay.png" HeightRequest="18"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Hora Inicio" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblHoraInicio" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="timerpause.png" HeightRequest="18"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Hora Fin" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblHora" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="clock.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Tiempo Total Empleado" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblTiempoTotal" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="mode.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Modo Operativo" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblModo" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Grid>
+
+                                <Border BackgroundColor="#F8F9FA" Stroke="#4F7F9E" StrokeThickness="1" Padding="15">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12"/>
+                                    </Border.StrokeShape>
+                                    <Border.Content>
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <VerticalStackLayout Grid.Column="0" x:Name="VistaLecturaVehiculo" Spacing="6" VerticalOptions="Center">
+                                                <Label Text="DATOS DEL VEHÍCULO" TextColor="#43AAA0" FontSize="12" FontAttributes="Bold"/>
+                                                <VerticalStackLayout Spacing="2">
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="Modelo / Motor:" TextColor="Gray" FontSize="13"/>
+                                                        <Label x:Name="LblVehiculo" Text="-" TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                                    </HorizontalStackLayout>
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="VIN:" TextColor="Gray" FontSize="13"/>
+                                                        <Label x:Name="LblChasis" Text="-" TextColor="#43AAA0" FontSize="14" FontAttributes="Bold"/>
+                                                    </HorizontalStackLayout>
+                                                </VerticalStackLayout>
+                                            </VerticalStackLayout>
+
+                                            <VerticalStackLayout Grid.Column="0" x:Name="VistaEdicionVehiculo" Spacing="6" IsVisible="False" VerticalOptions="Center">
+                                                <Label Text="EDITAR DATOS DEL VEHÍCULO" TextColor="#43AAA0" FontSize="12" FontAttributes="Bold"/>
+                                                <VerticalStackLayout Spacing="10">
+                                                    <HorizontalStackLayout Spacing="10">
+                                                        <Border Stroke="#CED4DA" StrokeThickness="1" BackgroundColor="White" Padding="5,0" HeightRequest="35" WidthRequest="110">
+                                                            <Border.StrokeShape>
+                                                                <RoundRectangle CornerRadius="6"/>
+                                                            </Border.StrokeShape>
+                                                            <Picker x:Name="PickerModeloEditar" Title="Modelo" FontSize="12" TextColor="#0F2166"/>
+                                                        </Border>
+
+                                                        <Border Stroke="#CED4DA" StrokeThickness="1" BackgroundColor="White" Padding="5,0" HeightRequest="35" WidthRequest="110">
+                                                            <Border.StrokeShape>
+                                                                <RoundRectangle CornerRadius="6"/>
+                                                            </Border.StrokeShape>
+                                                            <Picker x:Name="PickerMotorEditar" Title="Motor" FontSize="12" TextColor="#0F2166"/>
+                                                        </Border>
+                                                    </HorizontalStackLayout>
+
+                                                    <Border Stroke="#CED4DA" StrokeThickness="1" BackgroundColor="White" HeightRequest="35" WidthRequest="150" HorizontalOptions="Start">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="6"/>
+                                                        </Border.StrokeShape>
+                                                        <Entry x:Name="EntryChasisEditar" Placeholder="VIN (2L+6N)" FontSize="12" TextColor="#43AAA0" FontAttributes="Bold" Margin="5,0" BackgroundColor="Transparent"/>
+                                                    </Border>
+                                                </VerticalStackLayout>
+                                            </VerticalStackLayout>
+
+                                            <Border Grid.Column="1" x:Name="BordeEditarCentral" BackgroundColor="#4F7F9E" StrokeThickness="0" WidthRequest="45" HeightRequest="45" VerticalOptions="End">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="22.5"/>
+                                                </Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Tapped="OnModificarEnLineaClicked" />
+                                                </Border.GestureRecognizers>
+                                                <Border.Content>
+                                                    <Label x:Name="IconoEditarCentral" Text="✎" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
+                                                </Border.Content>
+                                            </Border>
+                                        </Grid>
+                                    </Border.Content>
+                                </Border>
+
+                                <BoxView HeightRequest="1" Color="#E0E0E0" Margin="0,-5"/>
+
+                                <VerticalStackLayout>
+                                    <Border StrokeThickness="2" Padding="15, 5" Margin="5,0,0,8" HorizontalOptions="Start" BackgroundColor="Transparent">
+                                        <Border.Stroke>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#43AAA0" Offset="0.0" />
+                                                <GradientStop Color="#243782" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.Stroke>
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="20" />
+                                        </Border.StrokeShape>
+                                        <Label Text="FASES TT" FontAttributes="Bold" TextColor="#243782" FontSize="12" />
+                                    </Border>
+                                    <VerticalStackLayout x:Name="ListaTT" BindableLayout.ItemTemplate="{StaticResource ItemResultadoTemplate}" Spacing="0"/>
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout>
+                                    <Border StrokeThickness="1.5" Padding="15, 5" Margin="5,0,0,8" HorizontalOptions="Start" BackgroundColor="Transparent">
+                                        <Border.Stroke>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#43AAA0" Offset="0.0" />
+                                                <GradientStop Color="#243782" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.Stroke>
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="20" />
+                                        </Border.StrokeShape>
+                                        <Label Text="CONTROL" FontAttributes="Bold" TextColor="#243782" FontSize="12" />
+                                    </Border>
+                                    <VerticalStackLayout x:Name="ListaControl" BindableLayout.ItemTemplate="{StaticResource ItemResultadoTemplate}" Spacing="0"/>
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout>
+                                    <Border StrokeThickness="1.5" Padding="15, 5" Margin="5,0,0,8" HorizontalOptions="Start" BackgroundColor="Transparent">
+                                        <Border.Stroke>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#43AAA0" Offset="0.0" />
+                                                <GradientStop Color="#243782" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.Stroke>
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="20" />
+                                        </Border.StrokeShape>
+                                        <Label Text="VISTO EN VEHÍCULO" FontAttributes="Bold" TextColor="#243782" FontSize="12" />
+                                    </Border>
+                                    <VerticalStackLayout x:Name="ListaVisto" BindableLayout.ItemTemplate="{StaticResource ItemResultadoTemplate}" Spacing="0"/>
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout x:Name="ContenedorOtros" IsVisible="False">
+                                    <Border StrokeThickness="1.5" Padding="15, 5" Margin="5,0,0,8" HorizontalOptions="Start" BackgroundColor="Transparent">
+                                        <Border.Stroke>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#43AAA0" Offset="0.0" />
+                                                <GradientStop Color="#243782" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.Stroke>
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="20" />
+                                        </Border.StrokeShape>
+                                        <Border.Content>
+                                            <Label Text="PUNTOS ESPECÍFICOS DEL MODELO" FontAttributes="Bold" TextColor="#243782" FontSize="12" />
+                                        </Border.Content>
+                                    </Border>
+                                    <VerticalStackLayout x:Name="ListaOtros" BindableLayout.ItemTemplate="{StaticResource ItemResultadoTemplate}" Spacing="0"/>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </ScrollView>
+                    </Border.Content>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Grid ColumnDefinitions="*, *" ColumnSpacing="10" Margin="20,0,20,-30" VerticalOptions="End">
+
+            <Border x:Name="BtnModificar" Grid.Column="0" HeightRequest="55" BackgroundColor="#4F7F9E" StrokeThickness="1.5" Margin="10,0,0,20">
+                <Border.Stroke>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#43AAA0" Offset="1.0" />
+                        <GradientStop Color="#243782" Offset="0.0" />
+                    </LinearGradientBrush>
+                </Border.Stroke>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,8" Opacity="0.2" Radius="10"/>
+                </Border.Shadow>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="27.5"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEditarFaseClicked"/>
+                </Border.GestureRecognizers>
+                <Border.Content>
+                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
+                        <Label Text="✎ MODIFICAR DATOS" TextColor="White" FontSize="12" VerticalOptions="Center" HorizontalTextAlignment="Center" CharacterSpacing="1"/>
+                    </HorizontalStackLayout>
+                </Border.Content>
+            </Border>
+
+            <Border x:Name="BtnGuardar" Grid.Column="1" HeightRequest="55" StrokeThickness="0" Background="#43AAA0" Margin="10,0,10,20">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="27.5" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,8" Opacity="0.2" Radius="10"/>
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnConfirmarClicked" />
+                </Border.GestureRecognizers>
+                <Border.Content>
+                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
+                        <Label Text="FINALIZAR Y ENVIAR" TextColor="White" FontSize="12"  VerticalOptions="Center" CharacterSpacing="1"/>
+                    </HorizontalStackLayout>
+                </Border.Content>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="OverlayEdicionFase" IsVisible="False" BackgroundColor="#99000000" ZIndex="90">
+            <Border BackgroundColor="White" Margin="20,0,20,0" Padding="15" VerticalOptions="Center" HorizontalOptions="Fill" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="40" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,10" Radius="20" Opacity="0.2"/>
+                </Border.Shadow>
+
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <Border Grid.Row="0" StrokeThickness="2" Padding="20, 10" WidthRequest="250" BackgroundColor="Transparent" Margin="0,0,0,10" HorizontalOptions="Center">
+                        <Border.Stroke>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#43AAA0" Offset="0.0" />
+                                <GradientStop Color="#243782" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Stroke>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="45" />
+                        </Border.StrokeShape>
+                        <Border.Content>
+                            <Label Text="MODIFICAR RESPUESTAS" TextColor="#0F2166" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" CharacterSpacing="1"/>
+                        </Border.Content>
+                    </Border>
+
+                    <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" Margin="0,5,0,10">
+                        <VerticalStackLayout Spacing="20">
+
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="FASE TT" FontAttributes="Bold" TextColor="#0F2166" FontSize="13"/>
+                                <VerticalStackLayout x:Name="SeccionPopUpTT" Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BackgroundColor="#F8F9FA" Padding="12,5" Stroke="#E0E0E0" StrokeThickness="1">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="10" />
+                                                </Border.StrokeShape>
+                                                <Border.Content>
+                                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                                        <Label Grid.Column="0" Text="{Binding Check}" TextColor="#333" VerticalOptions="Center" FontSize="13" LineBreakMode="WordWrap"/>
+                                                        <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                                            <Button Text="OK" Clicked="OnOkClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="OK">
+                                                                        <Setter Property="BackgroundColor" Value="#28a745" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                            <Button Text="NOK" Clicked="OnNoClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="NOK">
+                                                                        <Setter Property="BackgroundColor" Value="#dc3545" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                        </HorizontalStackLayout>
+                                                    </Grid>
+                                                </Border.Content>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="FASE CONTROL" FontAttributes="Bold" TextColor="#0F2166" FontSize="13"/>
+                                <VerticalStackLayout x:Name="SeccionPopUpControl" Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BackgroundColor="#F8F9FA" Padding="12,5" Stroke="#E0E0E0" StrokeThickness="1">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="10" />
+                                                </Border.StrokeShape>
+                                                <Border.Content>
+                                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                                        <Label Grid.Column="0" Text="{Binding Check}" TextColor="#333" VerticalOptions="Center" FontSize="13" LineBreakMode="WordWrap"/>
+                                                        <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                                            <Button Text="OK" Clicked="OnOkClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="OK">
+                                                                        <Setter Property="BackgroundColor" Value="#28a745" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                            <Button Text="NOK" Clicked="OnNoClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="NOK">
+                                                                        <Setter Property="BackgroundColor" Value="#dc3545" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                        </HorizontalStackLayout>
+                                                    </Grid>
+                                                </Border.Content>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="FASE VISTO EN VEHÍCULO" FontAttributes="Bold" TextColor="#0F2166" FontSize="13"/>
+                                <VerticalStackLayout x:Name="SeccionPopUpVisto" Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BackgroundColor="#F8F9FA" Padding="12,10" Stroke="#E0E0E0" StrokeThickness="1">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="10" />
+                                                </Border.StrokeShape>
+                                                <Border.Content>
+                                                    <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto" RowSpacing="8" ColumnSpacing="10">
+                                                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Check}" TextColor="#333" VerticalOptions="Center" FontSize="13" LineBreakMode="WordWrap"/>
+                                                        <Border Grid.Row="1" Grid.Column="0" Stroke="#CED4DA" StrokeThickness="1" BackgroundColor="White" HeightRequest="35" VerticalOptions="Center">
+                                                            <Border.StrokeShape>
+                                                                <RoundRectangle CornerRadius="6"/>
+                                                            </Border.StrokeShape>
+                                                            <Entry Text="{Binding Observacion}" Placeholder="Escribe..." FontSize="11" TextColor="#333" BackgroundColor="Transparent" Margin="5,0" Completed="OnEntryCompleted"/>
+                                                        </Border>
+                                                        <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
+                                                            <Button Text="OK" Clicked="OnOkClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="OK">
+                                                                        <Setter Property="BackgroundColor" Value="#28a745" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                            <Button Text="NOK" Clicked="OnNoClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="NOK">
+                                                                        <Setter Property="BackgroundColor" Value="#dc3545" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                        </HorizontalStackLayout>
+                                                    </Grid>
+                                                </Border.Content>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout x:Name="ContenedorPopUpOtros" Spacing="8" IsVisible="False">
+                                <Label Text="ESPECÍFICOS MODELO" FontAttributes="Bold" TextColor="#0F2166" FontSize="13"/>
+                                <VerticalStackLayout x:Name="SeccionPopUpOtros" Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BackgroundColor="#F8F9FA" Padding="12,5" Stroke="#E0E0E0" StrokeThickness="1">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="10" />
+                                                </Border.StrokeShape>
+                                                <Border.Content>
+                                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                                        <Label Grid.Column="0" Text="{Binding Check}" TextColor="#333" VerticalOptions="Center" FontSize="13" LineBreakMode="WordWrap"/>
+                                                        <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                                            <Button Text="OK" Clicked="OnOkClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="OK">
+                                                                        <Setter Property="BackgroundColor" Value="#28a745" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                            <Button Text="NOK" Clicked="OnNoClicked" WidthRequest="45" HeightRequest="30" FontSize="11" Padding="0" BackgroundColor="#A2ADB9">
+                                                                <Button.Triggers>
+                                                                    <DataTrigger TargetType="Button" Binding="{Binding Estado}" Value="NOK">
+                                                                        <Setter Property="BackgroundColor" Value="#dc3545" />
+                                                                    </DataTrigger>
+                                                                </Button.Triggers>
+                                                            </Button>
+                                                        </HorizontalStackLayout>
+                                                    </Grid>
+                                                </Border.Content>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+                    </ScrollView>
+
+                    <Border Grid.Row="2" HeightRequest="45" StrokeThickness="0" Margin="0,10,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#43AAA0" Offset="1.0" />
+                                <GradientStop Color="#243782" Offset="0.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="22.5"/>
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCerrarOverlayEdicionFase"/>
+                        </Border.GestureRecognizers>
+                        <Border.Content>
+                            <Label Text="APLICAR Y CERRAR" TextColor="White" FontAttributes="Bold" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" CharacterSpacing="1"/>
+                        </Border.Content>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

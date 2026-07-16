@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Aplicacion_SCA.Pages.LoginPage"
+             BackgroundColor="#45728F"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid IgnoreSafeArea="True">
+
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFondoTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border VerticalOptions="Start" HeightRequest="300" StrokeThickness="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,1">
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                    <GradientStop Color="#243782" Offset="0.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,40,40" />
+            </Border.StrokeShape>
+        </Border>
+
+        <Grid Padding="0,160,0,50">
+
+            <Grid x:Name="ContenedorTarjeta" Margin="30,0,30,110" VerticalOptions="Center">
+
+                <Border BackgroundColor="#FAFAFA" StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,5" Radius="15" Opacity="0.1" />
+                    </Border.Shadow>
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="25" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFondoTapped" />
+                    </Border.GestureRecognizers>
+
+                    <ScrollView VerticalScrollBarVisibility="Never">
+                        <VerticalStackLayout Spacing="22" Padding="25, 30, 25, 20" HorizontalOptions="Center">
+
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnFondoTapped" />
+                            </VerticalStackLayout.GestureRecognizers>
+
+                            <Image Source="stellantis.png" 
+                                   HeightRequest="45" 
+                                   HorizontalOptions="Center" 
+                                   Aspect="AspectFit"/>
+
+                            <Border StrokeThickness="2" 
+                                    Padding="20, 10"
+                                    WidthRequest="230"
+                                    BackgroundColor="Transparent">
+                                <Border.Stroke>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#43AAA0" Offset="0.0" />
+                                        <GradientStop Color="#243782" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Stroke>
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="45" />
+                                </Border.StrokeShape>
+                                <Border.Content>
+                                    <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                        <Label x:Name="LblAccesoAuditor"
+                                               Text="ACCESO AUDITOR" 
+                                               TextColor="#0F2166" 
+                                               FontSize="18" 
+                                               FontAttributes="Bold" 
+                                               HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+                                </Border.Content>
+                            </Border>
+
+                            <Border Stroke="#E0E0E0"
+                                    StrokeThickness="1"
+                                    WidthRequest="230"
+                                    HeightRequest="50"
+                                    HorizontalOptions="Center"
+                                    BackgroundColor="White">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Entry x:Name="TxtUsuario" 
+                                       Placeholder="Usuario" 
+                                       TextColor="Black"
+                                       PlaceholderColor="Silver"
+                                       CharacterSpacing="1"
+                                       HorizontalTextAlignment="Center"
+                                       BackgroundColor="Transparent"/>
+                            </Border>
+
+                            <Border Stroke="#E0E0E0"
+                                    StrokeThickness="1"
+                                    WidthRequest="230"
+                                    HeightRequest="50"
+                                    HorizontalOptions="Center"
+                                    BackgroundColor="White">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+
+                                <Grid>
+                                    <Entry x:Name="TxtPassword" 
+                                           Placeholder="Contraseña"
+                                           TextColor="Black"
+                                           IsPassword="True" 
+                                           PlaceholderColor="Silver"
+                                           CharacterSpacing="1"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"
+                                           BackgroundColor="Transparent"
+                                           ReturnType="Done" 
+                                           Completed="OnPasswordCompleted" />
+
+                                    <Image x:Name="ImgOjo"
+                                           Source="eye_closed.png" 
+                                           HeightRequest="22"
+                                           WidthRequest="22"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="End"
+                                           Margin="0,0,15,0">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnVerPasswordTapped" />
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                </Grid>
+                            </Border>
+
+                            <Border x:Name="BtnEmpezar"
+                                    HeightRequest="55"
+                                    WidthRequest="200" 
+                                    StrokeThickness="0"
+                                    HorizontalOptions="Center"
+                                    Margin="0,5,0,0">
+                                <Border.Shadow>
+                                    <Shadow Brush="Black" Offset="0,8" Radius="15" Opacity="0.4"/>
+                                </Border.Shadow>
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="50" />
+                                </Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#43AAA0" Offset="1.0" />
+                                        <GradientStop Color="#243782" Offset="0.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnLoginClicked" />
+                                </Border.GestureRecognizers>
+
+                                <Border.Content>
+                                    <Label x:Name="LblTextoEntrar"
+                                           Text="ENTRAR"
+                                           TextColor="White"
+                                           FontSize="18"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           CharacterSpacing="1"/>
+                                </Border.Content>
+                            </Border>
+
+                        </VerticalStackLayout>
+                    </ScrollView>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Label Text="Stellantis Vigo - QCP/AVCF"
+               FontSize="12"
+               TextColor="#325369"
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Margin="0,0,0,45"
+               FontAttributes="Bold"/>
+
+    </Grid>
+</ContentPage>

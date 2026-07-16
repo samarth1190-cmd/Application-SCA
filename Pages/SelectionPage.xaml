@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Aplicacion_SCA.Pages.SelectionPage"
+             BackgroundColor="#45728F"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid IgnoreSafeArea="True">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFondoTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border VerticalOptions="Start" HeightRequest="280" StrokeThickness="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,1">
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                    <GradientStop Color="#243782" Offset="0.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,40,40" />
+            </Border.StrokeShape>
+        </Border>
+
+        <Grid RowDefinitions="Auto, *" Padding="0,10,0,100">
+
+            <VerticalStackLayout Grid.Row="0" VerticalOptions="Start" Padding="25,0,25,0" Spacing="10">
+                <Border x:Name="BtnVolver" HeightRequest="30" WidthRequest="80" HorizontalOptions="Start" BackgroundColor="Transparent" Stroke="White" StrokeThickness="1.5">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnVolverClicked" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="5">
+                        <Label x:Name="LblVolver" Text="← Volver" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <HorizontalStackLayout Spacing="10" Margin="5,0,0,0">
+                    <Border WidthRequest="40" HeightRequest="40" BackgroundColor="#44FFFFFF" StrokeThickness="0" VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <Ellipse/>
+                        </Border.StrokeShape>
+                        <Image Source="user.png" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                        <Label x:Name="LblHola" Text="Auditor Desconocido" TextColor="White" FontSize="15" FontAttributes="Bold"/>
+                        <Label x:Name="LblTurno" Text="Sin turno definido" TextColor="#3BF1E5" FontSize="13" Margin="0,0,0,0"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <Grid x:Name="ContenedorTarjeta" Grid.Row="1" Margin="30,15,30,-30">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnFondoTapped" />
+                </Grid.GestureRecognizers>
+
+                <Border BackgroundColor="#FAFAFA" StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="25" />
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,5" Radius="15" Opacity="0.1" />
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFondoTapped" />
+                    </Border.GestureRecognizers>
+
+                    <ScrollView VerticalScrollBarVisibility="Never">
+                        <VerticalStackLayout Spacing="12" Padding="25,15,25,25">
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnFondoTapped" />
+                            </VerticalStackLayout.GestureRecognizers>
+
+                            <Border StrokeThickness="2" Padding="20, 10" WidthRequest="250" BackgroundColor="Transparent" Margin="0,0,0,10">
+                                <Border.Stroke>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#43AAA0" Offset="0.0" />
+                                        <GradientStop Color="#243782" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Stroke>
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="45" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                    <Label x:Name="LblTipoAuditoria" Text="MODO SELECCIONADO" TextColor="#0F2166" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <VerticalStackLayout x:Name="ContenedorOpcionRodaje" Spacing="10">
+                                <Label Text="1. RODAJE EXTERIOR" TextColor="#0F2166" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" />
+                                <Border Stroke="#A2ADB9" StrokeThickness="1" BackgroundColor="White" WidthRequest="250" HorizontalOptions="Center" Padding="15, 10">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12"/>
+                                    </Border.StrokeShape>
+                                    <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
+                                        <Label x:Name="LblIncluirPrueba" Grid.Column="0" Text="Incluir prueba exterior" TextColor="#555" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+                                        <Switch x:Name="SwitchRodajeExterior" Grid.Column="1" IsToggled="False" OnColor="#43AAA0" ThumbColor="Gray" VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Spacing="10">
+                                <Label x:Name="LblTituloModelo" Text="2. SELECCIONE MODELO" TextColor="#0F2166" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" />
+                                <VerticalStackLayout x:Name="ContenedorModelos" Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="x:String">
+                                            <Button Text="{Binding .}" Clicked="OnModeloClicked" HeightRequest="50" WidthRequest="250" HorizontalOptions="Center" BackgroundColor="White" TextColor="#555" BorderColor="#E0E0E0" BorderWidth="1" FontSize="14" FontAttributes="Bold">
+                                                <Button.CornerRadius>12</Button.CornerRadius>
+                                            </Button>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Spacing="10">
+                                <Label x:Name="LblTituloMotor" Text="3. SELECCIONE MOTORIZACIÓN" TextColor="#0F2166" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" />
+                                <VerticalStackLayout x:Name="ContenedorMotores" Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="x:String">
+                                            <Button Text="{Binding .}" Clicked="OnMotorClicked" HeightRequest="50" WidthRequest="250" HorizontalOptions="Center" BackgroundColor="White" TextColor="#555" BorderColor="#E0E0E0" BorderWidth="1" FontSize="14" FontAttributes="Bold">
+                                                <Button.CornerRadius>12</Button.CornerRadius>
+                                            </Button>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+                    </ScrollView>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Border x:Name="BtnComenzarFlotante"
+                HeightRequest="55" WidthRequest="250" 
+                StrokeThickness="0" 
+                HorizontalOptions="Center" 
+                VerticalOptions="End"
+                Margin="0,0,0,45">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                    <GradientStop Color="#243782" Offset="0.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="27.5" />
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,8" Opacity="0.2" Radius="10"/>
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnIniciarAuditoria" />
+            </Border.GestureRecognizers>
+            <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                <Label x:Name="LblTextoComenzar" Text="COMENZAR INSPECCIÓN" TextColor="White" FontSize="14" VerticalOptions="Center" CharacterSpacing="1"/>
+            </HorizontalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

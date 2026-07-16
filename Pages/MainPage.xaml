@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Aplicacion_SCA.Pages.MainPage"
+             BackgroundColor="#F5F6FA"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid x:Name="ContenedorPrincipal" RowDefinitions="Auto, Auto, Auto, Auto, *, Auto, Auto" Padding="0,50,0,0" IgnoreSafeArea="True">
+
+        <Image x:Name="LogoImg"
+               Grid.Row="0" 
+               Source="stellantis.png" 
+               HeightRequest="45" 
+               HorizontalOptions="Center" 
+               Margin="0,15,0,5"
+               Opacity="0.8"
+               Aspect="AspectFit"/>
+
+        <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center" Spacing="15" Margin="0,5,0,5">
+            <Border x:Name="BtnLangES" HeightRequest="36" WidthRequest="36" StrokeThickness="1.5" Stroke="#A2ADB9" BackgroundColor="White">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLangESClicked" />
+                </Border.GestureRecognizers>
+                <Label x:Name="LblLangES" Text="ES" TextColor="#243782" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+            <Border x:Name="BtnLangEN" HeightRequest="36" WidthRequest="36" StrokeThickness="1.5" Stroke="#A2ADB9" BackgroundColor="White">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLangENClicked" />
+                </Border.GestureRecognizers>
+                <Label x:Name="LblLangEN" Text="EN" TextColor="#243782" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+            <Border x:Name="BtnLangFR" HeightRequest="36" WidthRequest="36" StrokeThickness="1.5" Stroke="#A2ADB9" BackgroundColor="White">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLangFRClicked" />
+                </Border.GestureRecognizers>
+                <Label x:Name="LblLangFR" Text="FR" TextColor="#243782" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+            <Border x:Name="BtnLangDE" HeightRequest="36" WidthRequest="36" StrokeThickness="1.5" Stroke="#A2ADB9" BackgroundColor="White">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLangDEClicked" />
+                </Border.GestureRecognizers>
+                <Label x:Name="LblLangDE" Text="DE" TextColor="#243782" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+        </HorizontalStackLayout>
+
+        <Border x:Name="ContenedorSCA"
+                Grid.Row="2"
+                StrokeThickness="3"
+                HeightRequest="75"        WidthRequest="200"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Margin="0,10,0,10" 
+                BackgroundColor="Transparent">
+            <Border.Stroke>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#43AAA0" Offset="0.0" />
+                    <GradientStop Color="#243782" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Stroke>
+
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="37.5" />
+            </Border.StrokeShape>
+
+            <Border.Content>
+                <Label Text="SCA"
+                       TextColor="#0F2166"
+                       CharacterSpacing="0.5"
+                       FontSize="46"
+                       HorizontalOptions="Center"    
+                       VerticalOptions="Center"      
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"/>
+            </Border.Content>
+        </Border>
+
+        <Label x:Name="TituloTexto"
+               Grid.Row="3"
+               Text="SISTEMA DE CONTROL DE AUDITORÍA"
+               TextColor="#0F2166"
+               FontSize="13"
+               CharacterSpacing="2"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" 
+               HorizontalTextAlignment="Center" 
+               Margin="25,18,25,18"/>
+
+        <Border x:Name="ContenedorImagen"
+                Grid.Row="4" 
+                StrokeThickness="0"
+                BackgroundColor="White"
+                Margin="0,10"
+                Padding="0"
+                VerticalOptions="Fill"
+                HorizontalOptions="Fill">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0" />
+            </Border.StrokeShape>
+
+            <Grid>
+                <Image Source="inicio.png" 
+                       Aspect="AspectFill"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill" />
+
+                <BoxView VerticalOptions="End" HeightRequest="60">
+                    <BoxView.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="Transparent" Offset="0"/>
+                            <GradientStop Color="#F5F7FA" Offset="1"/>
+                        </LinearGradientBrush>
+                    </BoxView.Background>
+                </BoxView>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="5"
+                x:Name="BtnEmpezar"
+                HeightRequest="55"
+                WidthRequest="250"
+                StrokeThickness="0"
+                HorizontalOptions="Center"
+                Margin="0,15,0,25">
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,8" Radius="15" Opacity="0.4"/>
+            </Border.Shadow>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="32" />
+            </Border.StrokeShape>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#243782" Offset="0.0" />
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnEmpezarClicked" />
+            </Border.GestureRecognizers>
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="10" VerticalOptions="Center">
+                <Label x:Name="LblTextoEmpezar"
+                       Text="EMPEZAR"
+                       TextColor="White"
+                       FontSize="16"
+                       CharacterSpacing="1"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+
+        <Label x:Name="FooterTexto"
+               Grid.Row="6"
+               Text="Stellantis Vigo - QCP/AVCF"
+               FontSize="11"
+               FontAttributes="Bold"
+               CharacterSpacing="1"
+               TextColor="Silver"
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Margin="0,0,0,45" />
+    </Grid>
+</ContentPage>

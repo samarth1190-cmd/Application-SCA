@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Aplicacion_SCA.Pages.ResultsPage"
+             BackgroundColor="#3D638A"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid IgnoreSafeArea="True">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFondoTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border VerticalOptions="Start" HeightRequest="280" StrokeThickness="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,1">
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                    <GradientStop Color="#243782" Offset="0.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,40,40" />
+            </Border.StrokeShape>
+        </Border>
+
+        <Grid RowDefinitions="Auto, *" Padding="0,0,0,150">
+
+            <VerticalStackLayout Grid.Row="0" VerticalOptions="Start" Padding="25,10,25,0" Spacing="10">
+                <Border x:Name="BtnVolver" 
+                        HeightRequest="32" WidthRequest="80" HorizontalOptions="Start"
+                        BackgroundColor="Transparent" Stroke="White" StrokeThickness="1.5">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnVolverClicked" />
+                    </Border.GestureRecognizers>
+                    <Border.Content>
+                        <Label Text="← Volver" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                    </Border.Content>
+                </Border>
+            </VerticalStackLayout>
+
+            <Grid x:Name="ContenedorTarjeta" Grid.Row="1" Margin="25,10,25,-80">
+                <Border BackgroundColor="#FAFAFA" StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="30"/>
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,10" Radius="20" Opacity="0.1" />
+                    </Border.Shadow>
+
+                    <ScrollView VerticalScrollBarVisibility="Never">
+                        <VerticalStackLayout Padding="20,20,20,50" Spacing="15">
+
+                            <VerticalStackLayout x:Name="ContenedorDatos" Spacing="15">
+                                <Border StrokeThickness="2" Padding="20, 5" WidthRequest="230" BackgroundColor="Transparent" HorizontalOptions="Center">
+                                    <Border.Stroke>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#43AAA0" Offset="0.0" />
+                                            <GradientStop Color="#243782" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="45" />
+                                    </Border.StrokeShape>
+                                    <Border.Content>
+                                        <Label Text="RESUMEN INFORME" TextColor="#0F2166" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
+                                    </Border.Content>
+                                </Border>
+
+                                <Grid RowDefinitions="Auto, Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="15">
+
+                                    <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0" VerticalOptions="Center">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="userinforme.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Auditor" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblAuditor" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="calendar.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Fecha" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblFecha" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="shift.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Turno" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblTurno" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="timerplay.png" HeightRequest="18"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Hora Inicio" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblHoraInicio" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="timerpause.png" HeightRequest="18"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Hora Fin" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblHora" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="3" Grid.Column="0" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="clock.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Tiempo Total" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblTiempoTotal" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Grid Grid.Row="3" Grid.Column="1" ColumnDefinitions="34, *" ColumnSpacing="10">
+                                        <Border Grid.Column="0" WidthRequest="34" HeightRequest="34" BackgroundColor="#E3F2FD" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <Ellipse/>
+                                            </Border.StrokeShape>
+                                            <Image Source="mode.png" HeightRequest="16"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="Modo" TextColor="Gray" FontSize="11"/>
+                                            <Label x:Name="LblModo" Text="..." TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Grid>
+                            </VerticalStackLayout>
+
+                            <Border BackgroundColor="#F8F9FA" Stroke="#4F7F9E" StrokeThickness="1" Padding="15">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12"/>
+                                </Border.StrokeShape>
+                                <Border.Content>
+                                    <Grid ColumnDefinitions="*, Auto">
+
+                                        <VerticalStackLayout Grid.Column="0" x:Name="VistaLecturaVehiculo" Spacing="6" VerticalOptions="Center">
+                                            <Label Text="DATOS DEL VEHÍCULO" TextColor="#43AAA0" FontSize="12" FontAttributes="Bold"/>
+                                            <VerticalStackLayout Spacing="2">
+                                                <HorizontalStackLayout Spacing="8">
+                                                    <Label Text="Vehículo / Motor:" TextColor="Gray" FontSize="13"/>
+                                                    <Label x:Name="LblVehiculoLectura" Text="-" TextColor="#0F2166" FontSize="14" FontAttributes="Bold"/>
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Spacing="8">
+                                                    <Label Text="VIN:" TextColor="Gray" FontSize="13"/>
+                                                    <Label x:Name="LblChasisLectura" Text="-" TextColor="#43AAA0" FontSize="14" FontAttributes="Bold"/>
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </VerticalStackLayout>
+
+                                        <VerticalStackLayout Grid.Column="0" x:Name="VistaEdicionVehiculo" Spacing="6" IsVisible="False" VerticalOptions="Center">
+                                            <Label Text="EDITAR DATOS" TextColor="#43AAA0" FontSize="12" FontAttributes="Bold"/>
+                                            <VerticalStackLayout Spacing="10">
+                                                <HorizontalStackLayout Spacing="10">
+                                                    <Border Stroke="#CED4DA" StrokeThickness="1" BackgroundColor="White" Padding="5,0" HeightRequest="35" WidthRequest="110">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="6"/>
+                                                        </Border.StrokeShape>
+                                                        <Picker x:Name="PickerModeloEditar" Title="Modelo" FontSize="12" TextColor="#0F2166"/>
+                                                    </Border>
+
+                                                    <Border Stroke="#CED4DA" StrokeThickness="1" BackgroundColor="White" Padding="5,0" HeightRequest="35" WidthRequest="110">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="6"/>
+                                                        </Border.StrokeShape>
+                                                        <Picker x:Name="PickerMotorEditar" Title="Motor" FontSize="12" TextColor="#0F2166"/>
+                                                    </Border>
+                                                </HorizontalStackLayout>
+
+                                                <Border Stroke="#CED4DA" StrokeThickness="1" BackgroundColor="White" HeightRequest="35" WidthRequest="150" HorizontalOptions="Start">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="6"/>
+                                                    </Border.StrokeShape>
+                                                    <Entry x:Name="EntryChasisEditar" Placeholder="VIN (2L+6N)" FontSize="12" TextColor="#43AAA0" FontAttributes="Bold" Margin="5,0" BackgroundColor="Transparent"/>
+                                                </Border>
+                                            </VerticalStackLayout>
+                                        </VerticalStackLayout>
+
+                                        <Border Grid.Column="1" x:Name="BordeEditarCentral" BackgroundColor="#4F7F9E" StrokeThickness="0" WidthRequest="45" HeightRequest="45" VerticalOptions="End">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="22.5"/>
+                                            </Border.StrokeShape>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnModificarEnLineaClicked" />
+                                            </Border.GestureRecognizers>
+                                            <Border.Content>
+                                                <Label x:Name="IconoEditarCentral" Text="✎" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
+                                            </Border.Content>
+                                        </Border>
+                                    </Grid>
+                                </Border.Content>
+                            </Border>
+
+                            <Border x:Name="ContenedorMapa" Stroke="Transparent" Margin="0,0,0,0" StrokeThickness="1.5" IsVisible="False">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="15"/>
+                                </Border.StrokeShape>
+                            </Border>
+
+                        </VerticalStackLayout>
+                    </ScrollView>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Grid ColumnDefinitions="*" Margin="20,0,20,-20" VerticalOptions="End">
+
+            <Border x:Name="BtnGuardar" Grid.Column="0" HeightRequest="55" WidthRequest="250" StrokeThickness="0" Background="#43AAA0" Margin="10,0,10,20" HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="27.5" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,8" Opacity="0.2" Radius="10"/>
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnConfirmarClicked" />
+                </Border.GestureRecognizers>
+                <Border.Content>
+                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
+                        <Label Text="FINALIZAR Y ENVIAR" TextColor="White" FontSize="14" VerticalOptions="Center" HorizontalTextAlignment="Center" CharacterSpacing="1"/>
+                    </HorizontalStackLayout>
+                </Border.Content>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

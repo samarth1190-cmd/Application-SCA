@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:pages="clr-namespace:Aplicacion_SCA.Pages"
+             x:Class="Aplicacion_SCA.Pages.MenuEstandarPage"
+             BackgroundColor="#45728F"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid IgnoreSafeArea="True">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFondoTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border VerticalOptions="Start" HeightRequest="280" StrokeThickness="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,1">
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                    <GradientStop Color="#243782" Offset="0.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,40,40" />
+            </Border.StrokeShape>
+        </Border>
+
+        <Grid RowDefinitions="Auto, *" Padding="0,0,0,130">
+
+            <VerticalStackLayout Grid.Row="0" Padding="25,10,25,0" Spacing="10">
+
+                <VerticalStackLayout HorizontalOptions="Start" Spacing="8">
+                    <Border x:Name="BtnVolver" 
+                            HeightRequest="30" WidthRequest="80" HorizontalOptions="Start"
+                            BackgroundColor="Transparent" Stroke="White" StrokeThickness="1.5">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16"/>
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnVolverClicked" />
+                        </Border.GestureRecognizers>
+                        <Border.Content>
+                            <Label Text="← Volver" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        </Border.Content>
+                    </Border>
+
+                    <HorizontalStackLayout Spacing="6" Margin="5,0,0,0">
+                        <Border WidthRequest="24" HeightRequest="24" BackgroundColor="#44FFFFFF" StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <Ellipse/>
+                            </Border.StrokeShape>
+                            <Border.Content>
+                                <Image Source="user.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border.Content>
+                        </Border>
+                        <Label x:Name="LblUsuarioNombre" Text="Auditor" TextColor="White" FontSize="11" FontAttributes="Bold" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout HorizontalOptions="Start" Spacing="6">
+                    <Border BackgroundColor="#22FFFFFF" StrokeThickness="0" Padding="15,4" HorizontalOptions="Start">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12"/>
+                        </Border.StrokeShape>
+                        <Border.Content>
+                            <HorizontalStackLayout Spacing="10">
+                                <Label FontSize="13" VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Modelo: " TextColor="White"/>
+                                            <Span x:Name="LblModeloText" Text="..." TextColor="White" FontAttributes="Bold" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label Text="|" TextColor="White" Opacity="0.4" VerticalOptions="Center"/>
+                                <Label FontSize="13" VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Motor: " TextColor="#B3FFFFFF" />
+                                            <Span x:Name="LblMotorText" Text="..." TextColor="White" FontAttributes="Bold" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </HorizontalStackLayout>
+                        </Border.Content>
+                    </Border>
+
+                    <Border BackgroundColor="#22FFFFFF" StrokeThickness="0" Padding="12,2" HorizontalOptions="Start">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Border.Content>
+                            <Label x:Name="LblChasisText" Text="VIN: PENDIENTE" TextColor="White" FontSize="11" FontAttributes="Bold"/>
+                        </Border.Content>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <Border Grid.Row="0"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Margin="0,10,36,0"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    BackgroundColor="#22FFFFFF"
+                    StrokeThickness="1"
+                    Stroke="Aqua"
+                    ZIndex="10">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="30"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAyudaClicked" />
+                </Border.GestureRecognizers>
+                <Border.Content>
+                    <Image Source="question.png" 
+                           WidthRequest="20" 
+                           HeightRequest="20" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" 
+                           Aspect="AspectFit"/>
+                </Border.Content>
+            </Border>
+
+            <Grid x:Name="ContenedorTarjeta" Grid.Row="1" Margin="30,20,30,-65">
+                <Border BackgroundColor="#FAFAFA" StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="30"/>
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,10" Radius="20" Opacity="0.1" />
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFondoTapped" />
+                    </Border.GestureRecognizers>
+
+                    <Border.Content>
+                        <Grid RowDefinitions="Auto, *">
+                            <VerticalStackLayout Grid.Row="0" Spacing="5" Padding="25,25,25,15">
+                                <Image Source="stellantis.png" 
+                                       HeightRequest="30" 
+                                       HorizontalOptions="Center" 
+                                       Aspect="AspectFit"/>
+
+                                <Border StrokeThickness="2" 
+                                        Padding="20, 10"
+                                        WidthRequest="250"
+                                        BackgroundColor="Transparent">
+                                    <Border.Stroke>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#43AAA0" Offset="0.0" />
+                                            <GradientStop Color="#243782" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="45" />
+                                    </Border.StrokeShape>
+                                    <Border.Content>
+                                        <Label x:Name="LblTipoAuditoria"
+                                               Text="HOJA DE RUTA"
+                                               TextColor="#0F2166"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center" />
+                                    </Border.Content>
+                                </Border>
+
+                                <VerticalStackLayout Spacing="5" Margin="0,10,0,0">
+                                    <Label Text="CHASIS DEL VEHÍCULO" TextColor="#0F2166" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                    <Border Stroke="#A2ADB9" StrokeThickness="1" BackgroundColor="White" WidthRequest="250" HorizontalOptions="Center">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Entry x:Name="EntChasisEstandar"
+                                               Placeholder="Ej: AB123456" 
+                                               PlaceholderColor="#ADB5BD" 
+                                               TextColor="#333" 
+                                               FontSize="15" 
+                                               FontAttributes="Bold" 
+                                               HeightRequest="45" 
+                                               WidthRequest="100"
+                                               HorizontalTextAlignment="Center" 
+                                               TextTransform="Uppercase" 
+                                               VerticalOptions="Center" 
+                                               MaxLength="8" 
+                                               BackgroundColor="Transparent"
+                                               TextChanged="OnChasisTextChanged"/>
+                                    </Border>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                            <CollectionView Grid.Row="1" x:Name="ListaFases" SelectionMode="None" Margin="25,0,25,0">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                                </CollectionView.ItemsLayout>
+
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="pages:EstandarUIItem">
+                                        <Border HeightRequest="55"
+                                                WidthRequest="250"
+                                                StrokeThickness="0"
+                                                Background="{Binding FondoPildora}"
+                                                Opacity="{Binding OpacidadBoton}"
+                                                Margin="0,0,0,10">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="45"/>
+                                            </Border.StrokeShape>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnEstandarTapped" CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Border.Content>
+                                                <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15" Padding="10,0,20,0">
+                                                    <Label Grid.Column="1" 
+                                                           Text="{Binding Nombre}" 
+                                                           TextColor="White" 
+                                                           FontSize="13" 
+                                                           FontAttributes="Bold" 
+                                                           VerticalOptions="Center"
+                                                           HorizontalOptions="Start"/>
+                                                    <Label Grid.Column="2" 
+                                                           Text="{Binding Icono}" 
+                                                           TextColor="White" 
+                                                           FontSize="16" 
+                                                           FontAttributes="Bold" 
+                                                           VerticalOptions="Center"
+                                                           Opacity="0.8"/>
+                                                </Grid>
+                                            </Border.Content>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+
+                                <CollectionView.Footer>
+                                    <ContentView HeightRequest="20" BackgroundColor="Transparent" />
+                                </CollectionView.Footer>
+                            </CollectionView>
+                        </Grid>
+                    </Border.Content>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Border HorizontalOptions="End"
+                VerticalOptions="Start"
+                Margin="0, 110, 30, 0"
+                WidthRequest="54"
+                HeightRequest="54"
+                BackgroundColor="White"
+                StrokeThickness="0"
+                ZIndex="100">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="27"/>
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,4" Radius="8" Opacity="0.15" />
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnDocumentosClicked"/>
+            </Border.GestureRecognizers>
+            <Border.Content>
+                <Label Text="📁" 
+                       FontSize="24" 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center"
+                       Margin="2,2,0,0"/>
+            </Border.Content>
+        </Border>
+
+        <Border VerticalOptions="End" Margin="25,0,25,45" HeightRequest="55" WidthRequest="250" StrokeThickness="0" HorizontalOptions="Fill">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#43AAA0" Offset="1.0" />
+                    <GradientStop Color="#243782" Offset="0.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="27.5" />
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,8" Opacity="0.15" Radius="10"/>
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnFinalizarAuditoriaClicked" />
+            </Border.GestureRecognizers>
+            <Border.Content>
+                <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                    <Label Text="FINALIZAR AUDITORÍA" TextColor="White" FontSize="14" VerticalOptions="Center" CharacterSpacing="1"/>
+                </HorizontalStackLayout>
+            </Border.Content>
+        </Border>
+
+        <Grid x:Name="OverlayDocumentos" 
+              IsVisible="False" 
+              BackgroundColor="#99000000" 
+              ZIndex="999">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCerrarDocumentosClicked" />
+            </Grid.GestureRecognizers>
+            <Border BackgroundColor="White"
+                    Margin="25"
+                    Padding="15"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <Border StrokeThickness="2" 
+                            Padding="20, 10"
+                            WidthRequest="250"
+                            BackgroundColor="Transparent"
+                            Margin="0,0,0,10">
+                        <Border.Stroke>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#43AAA0" Offset="0.0" />
+                                <GradientStop Color="#243782" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Stroke>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="45" />
+                        </Border.StrokeShape>
+                        <Border.Content>
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="DOCUMENTOS" 
+                                       TextColor="#0F2166" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border.Content>
+                    </Border>
+
+                    <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" MaximumHeightRequest="500">
+                        <StackLayout x:Name="ContenedorListaPdfs" Spacing="10" Margin="10" WidthRequest="250">
+                        </StackLayout>
+                    </ScrollView>
+
+                    <Border Grid.Row="2"
+                            Margin="0,10,0,20"
+                            WidthRequest="250"
+                            HeightRequest="50"
+                            StrokeThickness="0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#43AAA0" Offset="1.0" />
+                                <GradientStop Color="#243782" Offset="0.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="25" />
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="Black" Offset="0,8" Opacity="0.2" Radius="10"/>
+                        </Border.Shadow>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCerrarDocumentosClicked" />
+                        </Border.GestureRecognizers>
+                        <Border.Content>
+                            <Label Text="CERRAR" 
+                                   TextColor="White" 
+                                   CharacterSpacing="1"
+                                   FontSize="16"
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center" />
+                        </Border.Content>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>
