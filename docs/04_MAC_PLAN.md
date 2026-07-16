@@ -1,5 +1,12 @@
 # Phases 4–9 — Multi-plant architecture proposal & migration plan (Vigo + MAC)
 
+> **STATUS 2026-07-16 (v1.6.0):** milestones 0–4 are IMPLEMENTED (git history
+> `8b9ada9..28a96f6`). Plant selection is live on C-DPV; MAC skeleton data is on
+> SharePoint under `02_Datos_App_MAC/` (SAMPLE content — replace with real data);
+> English Vosk model shipped. Still pending: per-plant results list ids
+> (milestone 5), real MAC CDPV content + GPS coordinates, per-plant VIN-format
+> hint messages. Owner answers to §7 are recorded in CHANGELOG 1.6.0.
+
 > Goal: add plant **MAC** (models **WD**, **WL**) behind a plant-selection step in
 > the *Audit Mode → C-DPV* flow, **without duplicating Vigo code and without
 > changing Vigo behavior**. Designed so Toluca / Windsor / Brampton / Melfi /
