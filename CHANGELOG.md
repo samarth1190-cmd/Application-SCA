@@ -9,6 +9,48 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.7.0] - 2026-08-18 — Claude (asistencia)
+
+### CAMBIADO
+- Planta **MAC renombrada a MACK** en todo el código, carpeta local
+  (`_ExcelSharePoint/MACK/`) y carpeta de SharePoint (`02_Datos_App_MACK`,
+  renombrada in situ, hijos preservados).
+- Localización completa (ES/EN/FR/DE) de las pantallas del flujo C-DPV/MACK:
+  selección de planta, título "AUDITORÍA C-DPV"/"AUDITORÍA RRU", "HOJA DE
+  RUTA..." (las 4 variantes), cabecera de chasis, "VIN: PENDIENTE"/"No
+  registrado", "Auditor Desconocido", Volver/Salir, "Paso X de Y", los 4
+  estados del botón de reproducción, "FINALIZAR ESTÁNDAR"/"FINALIZAR
+  AUDITORÍA", Documentos/Cerrar, "VALIDAR Y CONTINUAR". Todo ahora sigue el
+  idioma elegido al arrancar la app en vez de texto fijo en español.
+- Corregido el `MaxLength` del campo VIN en `MenuEstandarPage` (estaba fijo a
+  8, formato de Vigo); ahora usa `PlantContext.Current.ChassisMaxLength`, así
+  que el VIN de 17 caracteres de MACK ya se puede escribir.
+
+### AÑADIDO
+- `ControlFase.Fase` (antes se descartaba la columna B del Excel). Se muestra
+  junto con `AudioFormacion` como referencia visual bajo cada instrucción en
+  `EstandarPage`, para que el auditor vea la fase y el texto de formación
+  mientras suena el audio.
+- Contenido real de `CDPV.xlsx` para MACK (401 filas, 5 fases: Static, Static
+  - After driving, Dynamic - Outside driving, Dynamic - Test Track, All along
+  dynamic test), subido a SharePoint sustituyendo las filas de muestra.
+- Repositorio git subido a GitHub (`github.com/samarth1190-cmd/Application-SCA`)
+  como copia de seguridad fuera de esta máquina.
+- APK de depuración `_APK/Aplicacion_SCA_v1.7.0.apk` (firmado con clave de
+  depuración automática, no con `firma_sca.keystore` — solo para pruebas en
+  tablet, no para distribución).
+
+### PENDIENTE
+- Firmar una APK de release con `firma_sca.keystore` (se necesita la
+  contraseña, que no está en el repositorio).
+- `TipoPlantilla` de las fases dinámicas de MACK usa "DINAMICO", no "RODAJE"
+  (el valor que el código busca para activar la pantalla guiada por GPS); sin
+  coordenadas GPS todavía no importa, pero habrá que decidir esto cuando se
+  añadan las coordenadas de la pista de pruebas.
+- Id real de la lista de resultados por planta (sigue vacío, ver 1.6.0).
+
+---
+
 ## [1.6.0] - 2026-07-16 — Claude (asistencia)
 
 ### AÑADIDO — Soporte multi-planta (Vigo + MAC) en el flujo C-DPV
