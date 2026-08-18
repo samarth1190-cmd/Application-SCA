@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(dotnet build -f net9.0-windows10.0.19041.0 -c Debug -v minimal)"
+      "PowerShell(dotnet build -f net9.0-windows10.0.19041.0 -c Debug -v minimal)",
+      "PowerShell($exe = \\(Resolve-Path \"bin\\\\Debug\\\\net9.0-windows10.0.19041.0\\\\win10-x64\\\\Aplicacion_SCA.exe\"\\).Path; $r = Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList $exe; Start-Sleep -Seconds 10; $p = Get-Process -Id $r.ProcessId -ErrorAction SilentlyContinue; if \\($p\\) { \"Running, PID $\\($p.Id\\), title '$\\($p.MainWindowTitle\\)'\" } else { \"exited\"; Get-Content \"$env:TEMP\\\\SCA_crash.log\" -Tail 15 -ErrorAction SilentlyContinue })",
+      "PowerShell(Get-Process Aplicacion_SCA -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Milliseconds 500; $exe = \\(Resolve-Path \"bin\\\\Debug\\\\net9.0-windows10.0.19041.0\\\\win10-x64\\\\Aplicacion_SCA.exe\"\\).Path; $r = Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList $exe; Start-Sleep -Seconds 10; $p = Get-Process -Id $r.ProcessId -ErrorAction SilentlyContinue; if \\($p\\) { \"Running, PID $\\($p.Id\\)\" } else { \"exited\"; Get-Content \"$env:TEMP\\\\SCA_crash.log\" -Tail 15 -ErrorAction SilentlyContinue })",
+      "PowerShell($line = \\(Get-Content \"Pages\\\\EstandarPage.xaml.cs\"\\)[551]; $line; $line.Length; \\($line.ToCharArray\\(\\) | ForEach-Object { [int]$_ }\\) -join \",\")",
+      "PowerShell($path = \"Pages\\\\EstandarPage.xaml.cs\"; $bytes = [System.IO.File]::ReadAllBytes\\($path\\); \"First bytes \\(hex\\): \" + \\(\\($bytes[0..8] | ForEach-Object { $_.ToString\\('X2'\\) }\\) -join ' '\\); \"File length: $\\($bytes.Length\\)\"; $lastWrite = \\(Get-Item $path\\).LastWriteTime; \"LastWriteTime: $lastWrite\"; Get-Process -Name \"Aplicacion_SCA\" -ErrorAction SilentlyContinue | Select-Object Id)",
+      "PowerShell(Get-Process Aplicacion_SCA -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Milliseconds 500; dotnet build -f net9.0-windows10.0.19041.0 -c Debug -nologo -clp:ErrorsOnly | Select-String -Pattern \"error|Build succ|Error\\\\\\(s\\\\\\)\" | ForEach-Object { $_.Line }; \"Exit: $LASTEXITCODE\")",
+      "PowerShell(Select-String -Path \"obj\\\\Debug\\\\net9.0-windows10.0.19041.0\\\\win10-x64\\\\project.assets.json\" -Pattern '\"Microsoft.Maui.Essentials/[^\"]+\"' -AllMatches | Select-Object -First 1 -ExpandProperty Matches | ForEach-Object { $_.Value })",
+      "PowerShell(dotnet build *)",
+      "PowerShell(dotnet run *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Invoke-WmiMethod *)"
     ]
   }
 }

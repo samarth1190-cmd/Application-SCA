@@ -67,11 +67,24 @@ public partial class EstandarPage : ContentPage
         _audioService = new Aplicacion_SCA.Platforms.Android.AudioCaptureService();
 #endif
 
+        ApplyTranslations();
         LblModeloText.Text = _modeloAuditoria;
         LblMotorText.Text = _motorAuditoria;
 
         _ = PrepararYCargarModeloVoskAsync();
         ActualizarBotonVisualmente();
+    }
+
+    private void ApplyTranslations()
+    {
+        LblVolverMenuTexto.Text = LocalizationService.Translate("BTN_VOLVER");
+        LblSalirTexto.Text = LocalizationService.Translate("BTN_SALIR");
+        LblModeloPrefijo.Text = LocalizationService.Translate("LBL_MODELO_PREFIJO");
+        LblMotorPrefijo.Text = LocalizationService.Translate("LBL_MOTOR_PREFIJO");
+        LblFinalizarEstandar.Text = LocalizationService.Translate("BTN_FINALIZAR_ESTANDAR");
+        LblValidarYContinuar.Text = LocalizationService.Translate("BTN_VALIDAR_CONTINUAR");
+        LblDocumentosHeader.Text = LocalizationService.Translate("OVERLAY_DOCUMENTOS");
+        LblCerrarDocumentos.Text = LocalizationService.Translate("BTN_CERRAR");
     }
 
     private async Task PrepararYCargarModeloVoskAsync()
@@ -150,15 +163,16 @@ public partial class EstandarPage : ContentPage
 
         try
         {
+            ApplyTranslations();
             SesionGlobal.IndiceEstandarActual = _miIndiceEstandar;
             DeviceDisplay.Current.KeepScreenOn = true;
 
             if (SesionGlobal.UsuarioActivo != null)
                 LblUsuarioNombre.Text = $"{SesionGlobal.UsuarioActivo.NOMBRE} {SesionGlobal.UsuarioActivo.APELLIDOS}";
             else
-                LblUsuarioNombre.Text = "Auditor Desconocido";
+                LblUsuarioNombre.Text = LocalizationService.Translate("MSG_AUDITOR_DESCONOCIDO");
 
-            LblChasisText.Text = !string.IsNullOrEmpty(SesionGlobal.ChasisActual) ? $"VIN: {SesionGlobal.ChasisActual}" : "VIN: No registrado";
+            LblChasisText.Text = !string.IsNullOrEmpty(SesionGlobal.ChasisActual) ? $"VIN: {SesionGlobal.ChasisActual}" : LocalizationService.Translate("MSG_VIN_NO_REGISTRADO");
 
             _indiceActual = Preferences.Get(ClaveGuardadoPaso, 0);
 
@@ -367,6 +381,8 @@ public partial class EstandarPage : ContentPage
             listaVisual.Add(new ItemTextoAudio
             {
                 TextoInstruccion = texto,
+                Fase = paso.Fase,
+                AudioFormacion = paso.AudioFormacion,
                 EsActivo = (i == _indiceActual)
             });
         }
@@ -768,7 +784,7 @@ public partial class EstandarPage : ContentPage
         {
             if (_pasosReales != null && _indiceActual < _pasosReales.Count)
             {
-                LblPasoActual.Text = $"Paso {_indiceActual + 1} de {_pasosReales.Count}";
+                LblPasoActual.Text = LocalizationService.TranslateFormat("MSG_PASO_DE", _indiceActual + 1, _pasosReales.Count);
                 ActualizarListaVisual();
 
                 await Task.Delay(150); 
@@ -810,19 +826,19 @@ public partial class EstandarPage : ContentPage
             switch (_estadoActual)
             {
                 case EstadoApp.Corriendo:
-                    LblIconoBoton.Text = "⏸ PAUSAR";
+                    LblIconoBoton.Text = LocalizationService.Translate("BTN_PAUSAR");
                     if (borderBtn != null) borderBtn.BackgroundColor = Color.FromArgb("#FF9800");
                     break;
                 case EstadoApp.Pausado:
-                    LblIconoBoton.Text = "▶ REPRODUCIR";
+                    LblIconoBoton.Text = LocalizationService.Translate("BTN_REPRODUCIR");
                     if (borderBtn != null) borderBtn.BackgroundColor = Color.FromArgb("#243782");
                     break;
                 case EstadoApp.Finalizado:
-                    LblIconoBoton.Text = "↻ REINICIAR";
+                    LblIconoBoton.Text = LocalizationService.Translate("BTN_REINICIAR");
                     if (borderBtn != null) borderBtn.BackgroundColor = Color.FromArgb("#4CAF50");
                     break;
                 default:
-                    LblIconoBoton.Text = "▶ COMENZAR";
+                    LblIconoBoton.Text = LocalizationService.Translate("BTN_COMENZAR_PASO");
                     if (borderBtn != null) borderBtn.BackgroundColor = Color.FromArgb("#243782");
                     break;
             }
@@ -1101,6 +1117,16 @@ public partial class EstandarPage : ContentPage
 public class ItemTextoAudio
 {
     public string TextoInstruccion { get; set; } = string.Empty;
+
+    // Referencia visual para el auditor: fase original del Excel y texto de
+    // formación de ese mismo paso, para poder consultarlos mientras suena el audio.
+    public string Fase { get; set; } = string.Empty;
+    public string AudioFormacion { get; set; } = string.Empty;
+    public bool TieneFase => !string.IsNullOrWhiteSpace(Fase);
+    public bool TieneAudioFormacion => !string.IsNullOrWhiteSpace(AudioFormacion);
+    public string FaseTexto => $"{LocalizationService.Translate("LBL_FASE_PREFIJO")}{Fase}";
+    public string AudioFormacionTexto => $"{LocalizationService.Translate("LBL_AUDIOFORMACION_PREFIJO")}{AudioFormacion}";
+
     public bool EsActivo { get; set; }
     public Color ColorBorde => EsActivo ? Color.FromArgb("#CACACA") : Color.FromArgb("#00000000");
     public double GrosorBorde => EsActivo ? 2.0 : 0.0;

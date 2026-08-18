@@ -41,7 +41,7 @@ public partial class LoginPage : ContentPage
             });
         }
 
-        // Usuario de pruebas para la planta MAC (eliminar antes de producción).
+        // Usuario de pruebas para la planta MACK (eliminar antes de producción).
         if (!SesionGlobal.ListaUsuarios.Any(u => u.CV.Equals("sam", StringComparison.OrdinalIgnoreCase)))
         {
             SesionGlobal.ListaUsuarios.Add(new Usuario
@@ -49,7 +49,7 @@ public partial class LoginPage : ContentPage
                 CV = "sam",
                 PSA = "admin",
                 NOMBRE = "Sam",
-                APELLIDOS = "MAC Test",
+                APELLIDOS = "MACK Test",
                 ROL = "Auditor",
                 TURNO = "A"
             });

@@ -839,6 +839,172 @@ namespace Aplicacion_SCA.Services
                 { Language.English, "SharePoint Error" },
                 { Language.French, "Erreur SharePoint" },
                 { Language.German, "SharePoint-Fehler" }
+            } },
+
+            // SelectionPage - título de cabecera por modo
+            { "AUDITORIA_CDPV_TITLE", new() {
+                { Language.Spanish, "AUDITORÍA C-DPV" },
+                { Language.English, "C-DPV AUDIT" },
+                { Language.French, "AUDIT C-DPV" },
+                { Language.German, "C-DPV-AUDIT" }
+            } },
+            { "AUDITORIA_RRU_TITLE", new() {
+                { Language.Spanish, "AUDITORÍA RRU" },
+                { Language.English, "RRU AUDIT" },
+                { Language.French, "AUDIT RRU" },
+                { Language.German, "RRU-AUDIT" }
+            } },
+
+            // MenuEstandarPage / EstandarPage / RodajeExterior - cabeceras comunes
+            { "HEADER_HOJA_RUTA_JAPON", new() {
+                { Language.Spanish, "HOJA DE RUTA JAPÓN" },
+                { Language.English, "JAPAN ROUTE SHEET" },
+                { Language.French, "FEUILLE DE ROUTE JAPON" },
+                { Language.German, "JAPAN-LAUFZETTEL" }
+            } },
+            { "HEADER_HOJA_RUTA_FORMACION", new() {
+                { Language.Spanish, "HOJA DE RUTA FORMACIÓN" },
+                { Language.English, "TRAINING ROUTE SHEET" },
+                { Language.French, "FEUILLE DE ROUTE FORMATION" },
+                { Language.German, "SCHULUNGS-LAUFZETTEL" }
+            } },
+            { "HEADER_HOJA_RUTA_AUDITORIA", new() {
+                { Language.Spanish, "HOJA DE RUTA AUDITORÍA" },
+                { Language.English, "AUDIT ROUTE SHEET" },
+                { Language.French, "FEUILLE DE ROUTE AUDIT" },
+                { Language.German, "AUDIT-LAUFZETTEL" }
+            } },
+            { "HEADER_HOJA_RUTA_DPV", new() {
+                { Language.Spanish, "HOJA DE RUTA DPV" },
+                { Language.English, "DPV ROUTE SHEET" },
+                { Language.French, "FEUILLE DE ROUTE DPV" },
+                { Language.German, "DPV-LAUFZETTEL" }
+            } },
+            { "HEADER_HOJA_RUTA_GENERICA", new() {
+                { Language.Spanish, "HOJA DE RUTA" },
+                { Language.English, "ROUTE SHEET" },
+                { Language.French, "FEUILLE DE ROUTE" },
+                { Language.German, "LAUFZETTEL" }
+            } },
+            { "HEADER_CHASIS_VEHICULO", new() {
+                { Language.Spanish, "CHASIS DEL VEHÍCULO" },
+                { Language.English, "VEHICLE VIN" },
+                { Language.French, "CHÂSSIS DU VÉHICULE" },
+                { Language.German, "FAHRGESTELLNUMMER" }
+            } },
+            { "PLACEHOLDER_CHASIS", new() {
+                { Language.Spanish, "VIN" },
+                { Language.English, "VIN" },
+                { Language.French, "VIN" },
+                { Language.German, "FIN" }
+            } },
+            { "MSG_VIN_PENDIENTE", new() {
+                { Language.Spanish, "VIN: PENDIENTE" },
+                { Language.English, "VIN: PENDING" },
+                { Language.French, "VIN : EN ATTENTE" },
+                { Language.German, "FIN: AUSSTEHEND" }
+            } },
+            { "MSG_VIN_NO_REGISTRADO", new() {
+                { Language.Spanish, "VIN: No registrado" },
+                { Language.English, "VIN: Not registered" },
+                { Language.French, "VIN : Non enregistré" },
+                { Language.German, "FIN: Nicht registriert" }
+            } },
+            { "MSG_AUDITOR_DESCONOCIDO", new() {
+                { Language.Spanish, "Auditor Desconocido" },
+                { Language.English, "Unknown Auditor" },
+                { Language.French, "Auditeur Inconnu" },
+                { Language.German, "Unbekannter Prüfer" }
+            } },
+            { "LBL_MODELO_PREFIJO", new() {
+                { Language.Spanish, "Modelo: " },
+                { Language.English, "Model: " },
+                { Language.French, "Modèle : " },
+                { Language.German, "Modell: " }
+            } },
+            { "LBL_MOTOR_PREFIJO", new() {
+                { Language.Spanish, "Motor: " },
+                { Language.English, "Engine: " },
+                { Language.French, "Motorisation : " },
+                { Language.German, "Motor: " }
+            } },
+            { "BTN_FINALIZAR_AUDITORIA", new() {
+                { Language.Spanish, "FINALIZAR AUDITORÍA" },
+                { Language.English, "FINISH AUDIT" },
+                { Language.French, "TERMINER L'AUDIT" },
+                { Language.German, "AUDIT ABSCHLIESSEN" }
+            } },
+            { "BTN_FINALIZAR_ESTANDAR", new() {
+                { Language.Spanish, "FINALIZAR ESTÁNDAR" },
+                { Language.English, "FINISH STANDARD" },
+                { Language.French, "TERMINER LA NORME" },
+                { Language.German, "STANDARD ABSCHLIESSEN" }
+            } },
+            { "MSG_PASO_DE", new() {
+                { Language.Spanish, "Paso {0} de {1}" },
+                { Language.English, "Step {0} of {1}" },
+                { Language.French, "Étape {0} sur {1}" },
+                { Language.German, "Schritt {0} von {1}" }
+            } },
+            { "BTN_PAUSAR", new() {
+                { Language.Spanish, "⏸ PAUSAR" },
+                { Language.English, "⏸ PAUSE" },
+                { Language.French, "⏸ PAUSE" },
+                { Language.German, "⏸ PAUSIEREN" }
+            } },
+            { "BTN_REPRODUCIR", new() {
+                { Language.Spanish, "▶ REPRODUCIR" },
+                { Language.English, "▶ PLAY" },
+                { Language.French, "▶ LIRE" },
+                { Language.German, "▶ ABSPIELEN" }
+            } },
+            { "BTN_REINICIAR", new() {
+                { Language.Spanish, "↻ REINICIAR" },
+                { Language.English, "↻ RESTART" },
+                { Language.French, "↻ REDÉMARRER" },
+                { Language.German, "↻ NEU STARTEN" }
+            } },
+            { "BTN_PAUSAR_RUTA", new() {
+                { Language.Spanish, "PAUSAR RUTA" },
+                { Language.English, "PAUSE ROUTE" },
+                { Language.French, "PAUSE ITINÉRAIRE" },
+                { Language.German, "ROUTE PAUSIEREN" }
+            } },
+            { "BTN_REANUDAR", new() {
+                { Language.Spanish, "▶ REANUDAR" },
+                { Language.English, "▶ RESUME" },
+                { Language.French, "▶ REPRENDRE" },
+                { Language.German, "▶ FORTSETZEN" }
+            } },
+            { "BTN_SALIR", new() {
+                { Language.Spanish, "✕ Salir" },
+                { Language.English, "✕ Exit" },
+                { Language.French, "✕ Quitter" },
+                { Language.German, "✕ Beenden" }
+            } },
+            { "BTN_COMENZAR_PASO", new() {
+                { Language.Spanish, "▶ COMENZAR" },
+                { Language.English, "▶ START" },
+                { Language.French, "▶ COMMENCER" },
+                { Language.German, "▶ STARTEN" }
+            } },
+            { "LBL_FASE_PREFIJO", new() {
+                { Language.Spanish, "Fase: " },
+                { Language.English, "Phase: " },
+                { Language.French, "Phase : " },
+                { Language.German, "Phase: " }
+            } },
+            { "LBL_AUDIOFORMACION_PREFIJO", new() {
+                { Language.Spanish, "Formación: " },
+                { Language.English, "Training: " },
+                { Language.French, "Formation : " },
+                { Language.German, "Schulung: " }
+            } },
+            { "BTN_VALIDAR_CONTINUAR", new() {
+                { Language.Spanish, "VALIDAR Y CONTINUAR" },
+                { Language.English, "VALIDATE AND CONTINUE" },
+                { Language.French, "VALIDER ET CONTINUER" },
+                { Language.German, "BESTÄTIGEN UND WEITER" }
             } }
         };
 

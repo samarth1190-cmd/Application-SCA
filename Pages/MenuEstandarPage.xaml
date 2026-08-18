@@ -39,7 +39,7 @@
                             <TapGestureRecognizer Tapped="OnVolverClicked" />
                         </Border.GestureRecognizers>
                         <Border.Content>
-                            <Label Text="← Volver" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <Label x:Name="LblVolverTexto" Text="← Volver" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                         </Border.Content>
                     </Border>
 
@@ -63,10 +63,10 @@
                         </Border.StrokeShape>
                         <Border.Content>
                             <HorizontalStackLayout Spacing="10">
-                                <Label FontSize="13" VerticalOptions="Center">
+                <Label FontSize="13" VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <Span Text="Modelo: " TextColor="White"/>
+                                            <Span x:Name="LblModeloPrefijo" Text="Modelo: " TextColor="White"/>
                                             <Span x:Name="LblModeloText" Text="..." TextColor="White" FontAttributes="Bold" />
                                         </FormattedString>
                                     </Label.FormattedText>
@@ -75,7 +75,7 @@
                                 <Label FontSize="13" VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <Span Text="Motor: " TextColor="#B3FFFFFF" />
+                                            <Span x:Name="LblMotorPrefijo" Text="Motor: " TextColor="#B3FFFFFF" />
                                             <Span x:Name="LblMotorText" Text="..." TextColor="White" FontAttributes="Bold" />
                                         </FormattedString>
                                     </Label.FormattedText>
@@ -165,23 +165,23 @@
                                 </Border>
 
                                 <VerticalStackLayout Spacing="5" Margin="0,10,0,0">
-                                    <Label Text="CHASIS DEL VEHÍCULO" TextColor="#0F2166" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                    <Label x:Name="LblChasisHeader" Text="CHASIS DEL VEHÍCULO" TextColor="#0F2166" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
                                     <Border Stroke="#A2ADB9" StrokeThickness="1" BackgroundColor="White" WidthRequest="250" HorizontalOptions="Center">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="12"/>
                                         </Border.StrokeShape>
                                         <Entry x:Name="EntChasisEstandar"
-                                               Placeholder="Ej: AB123456" 
-                                               PlaceholderColor="#ADB5BD" 
-                                               TextColor="#333" 
-                                               FontSize="15" 
-                                               FontAttributes="Bold" 
-                                               HeightRequest="45" 
+                                               Placeholder="VIN"
+                                               PlaceholderColor="#ADB5BD"
+                                               TextColor="#333"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               HeightRequest="45"
                                                WidthRequest="100"
-                                               HorizontalTextAlignment="Center" 
-                                               TextTransform="Uppercase" 
-                                               VerticalOptions="Center" 
-                                               MaxLength="8" 
+                                               HorizontalTextAlignment="Center"
+                                               TextTransform="Uppercase"
+                                               VerticalOptions="Center"
+                                               MaxLength="17"
                                                BackgroundColor="Transparent"
                                                TextChanged="OnChasisTextChanged"/>
                                     </Border>
@@ -283,7 +283,7 @@
             </Border.GestureRecognizers>
             <Border.Content>
                 <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
-                    <Label Text="FINALIZAR AUDITORÍA" TextColor="White" FontSize="14" VerticalOptions="Center" CharacterSpacing="1"/>
+                    <Label x:Name="LblFinalizarAuditoria" Text="FINALIZAR AUDITORÍA" TextColor="White" FontSize="14" VerticalOptions="Center" CharacterSpacing="1"/>
                 </HorizontalStackLayout>
             </Border.Content>
         </Border>
@@ -322,10 +322,10 @@
                         </Border.StrokeShape>
                         <Border.Content>
                             <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
-                                <Label Text="DOCUMENTOS" 
-                                       TextColor="#0F2166" 
-                                       FontSize="18" 
-                                       FontAttributes="Bold" 
+                                <Label x:Name="LblDocumentosHeader" Text="DOCUMENTOS"
+                                       TextColor="#0F2166"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
                                        HorizontalOptions="Center" />
                             </VerticalStackLayout>
                         </Border.Content>
@@ -357,11 +357,11 @@
                             <TapGestureRecognizer Tapped="OnCerrarDocumentosClicked" />
                         </Border.GestureRecognizers>
                         <Border.Content>
-                            <Label Text="CERRAR" 
-                                   TextColor="White" 
+                            <Label x:Name="LblCerrarDocumentos" Text="CERRAR"
+                                   TextColor="White"
                                    CharacterSpacing="1"
                                    FontSize="16"
-                                   HorizontalOptions="Center" 
+                                   HorizontalOptions="Center"
                                    VerticalOptions="Center" />
                         </Border.Content>
                     </Border>

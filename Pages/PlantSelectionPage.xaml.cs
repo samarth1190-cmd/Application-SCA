@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Aplicacion_SCA.Pages;
 
-// Pantalla intermedia del flujo C-DPV: elige la planta (Vigo, MAC, ...) antes de
+// Pantalla intermedia del flujo C-DPV: elige la planta (Vigo, MACK, ...) antes de
 // la selección de modelo/motor. El resto de modos no pasan por aquí y siempre
 // trabajan con Vigo (AuditModePage resetea PlantContext al aparecer).
 public partial class PlantSelectionPage : ContentPage

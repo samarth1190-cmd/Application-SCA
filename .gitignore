@@ -6,3 +6,5 @@ obj/
 _APK/
 firma_sca.keystore
 .claude/settings.local.json
+*.lnk
+~$*.xlsx

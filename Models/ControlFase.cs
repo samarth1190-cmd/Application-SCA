@@ -3,6 +3,9 @@
     public class ControlFase
     {
         public int NumeroFase { get; set; }
+        // Valor original de la columna B ("Fase") del Excel. Es solo referencia
+        // visual para el auditor (histórico de formación); no afecta a la lógica.
+        public string Fase { get; set; } = string.Empty;
         public string AudioFormacion { get; set; } = string.Empty;
         public string TiempoFormacion { get; set; } = string.Empty;
         public string AudioAuditoria { get; set; } = string.Empty;

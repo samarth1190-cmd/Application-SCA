@@ -625,7 +625,7 @@ public partial class AuditModePage : ContentPage
 
         await AnimarBoton(sender as VisualElement);
         SesionGlobal.ModoSeleccionado = "CORE_DPV";
-        // C-DPV pasa primero por la selección de planta (Vigo / MAC).
+        // C-DPV pasa primero por la selección de planta (Vigo / MACK).
         await Navigation.PushAsync(new PlantSelectionPage("CORE_DPV"));
     }
 

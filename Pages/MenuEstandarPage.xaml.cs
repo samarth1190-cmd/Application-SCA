@@ -39,26 +39,41 @@ public partial class MenuEstandarPage : ContentPage
         _motor = motor;
         _modo = modo;
 
+        ApplyTranslations();
         ConfigurarTituloModo();
 
         LblModeloText.Text = _modelo;
         LblMotorText.Text = _motor;
 
+        EntChasisEstandar.MaxLength = PlantContext.Current.ChassisMaxLength;
+        EntChasisEstandar.Placeholder = LocalizationService.Translate("PLACEHOLDER_CHASIS");
+
         ListaFases.ItemsSource = _itemsEstandarVisual;
+    }
+
+    private void ApplyTranslations()
+    {
+        LblVolverTexto.Text = LocalizationService.Translate("BTN_VOLVER");
+        LblModeloPrefijo.Text = LocalizationService.Translate("LBL_MODELO_PREFIJO");
+        LblMotorPrefijo.Text = LocalizationService.Translate("LBL_MOTOR_PREFIJO");
+        LblChasisHeader.Text = LocalizationService.Translate("HEADER_CHASIS_VEHICULO");
+        LblFinalizarAuditoria.Text = LocalizationService.Translate("BTN_FINALIZAR_AUDITORIA");
+        LblDocumentosHeader.Text = LocalizationService.Translate("OVERLAY_DOCUMENTOS");
+        LblCerrarDocumentos.Text = LocalizationService.Translate("BTN_CERRAR");
     }
 
     private void ConfigurarTituloModo()
     {
         if (_modo.Contains("Japon", StringComparison.OrdinalIgnoreCase))
-            LblTipoAuditoria.Text = "HOJA DE RUTA JAPÓN";
+            LblTipoAuditoria.Text = LocalizationService.Translate("HEADER_HOJA_RUTA_JAPON");
         else if (_modo.Contains("Formacion", StringComparison.OrdinalIgnoreCase))
-            LblTipoAuditoria.Text = "HOJA DE RUTA FORMACIÓN";
+            LblTipoAuditoria.Text = LocalizationService.Translate("HEADER_HOJA_RUTA_FORMACION");
         else if (_modo.Contains("CORE_DPV", StringComparison.OrdinalIgnoreCase))
-            LblTipoAuditoria.Text = "HOJA DE RUTA AUDITORÍA";
+            LblTipoAuditoria.Text = LocalizationService.Translate("HEADER_HOJA_RUTA_AUDITORIA");
         else if (_modo.Equals("DPV", StringComparison.OrdinalIgnoreCase))
-            LblTipoAuditoria.Text = "HOJA DE RUTA DPV";
+            LblTipoAuditoria.Text = LocalizationService.Translate("HEADER_HOJA_RUTA_DPV");
         else
-            LblTipoAuditoria.Text = "HOJA DE RUTA";
+            LblTipoAuditoria.Text = LocalizationService.Translate("HEADER_HOJA_RUTA_GENERICA");
     }
 
     protected override async void OnAppearing()
@@ -68,6 +83,8 @@ public partial class MenuEstandarPage : ContentPage
         _isNavegando = false;
 
         ConfigurarBarraNativaAndroid();
+        ApplyTranslations();
+        ConfigurarTituloModo();
         ActualizarLabelsUsuarioYChasis();
         RegistrarFinFaseActual();
 
@@ -238,11 +255,11 @@ public partial class MenuEstandarPage : ContentPage
         if (SesionGlobal.UsuarioActivo != null)
             LblUsuarioNombre.Text = $"{SesionGlobal.UsuarioActivo.NOMBRE} {SesionGlobal.UsuarioActivo.APELLIDOS}";
         else
-            LblUsuarioNombre.Text = "Auditor Desconocido";
+            LblUsuarioNombre.Text = LocalizationService.Translate("MSG_AUDITOR_DESCONOCIDO");
 
         LblChasisText.Text = !string.IsNullOrEmpty(SesionGlobal.ChasisActual)
             ? $"VIN: {SesionGlobal.ChasisActual}"
-            : "VIN: PENDIENTE";
+            : LocalizationService.Translate("MSG_VIN_PENDIENTE");
     }
 
     private void RegistrarFinFaseActual()
@@ -343,7 +360,7 @@ public partial class MenuEstandarPage : ContentPage
     {
         string nuevoChasis = e.NewTextValue?.ToUpper() ?? "";
         SesionGlobal.ChasisActual = nuevoChasis;
-        LblChasisText.Text = string.IsNullOrEmpty(nuevoChasis) ? "VIN: PENDIENTE" : $"VIN: {nuevoChasis}";
+        LblChasisText.Text = string.IsNullOrEmpty(nuevoChasis) ? LocalizationService.Translate("MSG_VIN_PENDIENTE") : $"VIN: {nuevoChasis}";
     }
 
     private async void OnEstandarTapped(object sender, TappedEventArgs e)

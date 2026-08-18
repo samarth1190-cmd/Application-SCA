@@ -16,7 +16,7 @@ namespace Aplicacion_SCA.Services.Plants
     // estructura interna que la de Vigo.
     public class PlantDefinition
     {
-        public string Code { get; init; } = string.Empty;          // "VIGO", "MAC"
+        public string Code { get; init; } = string.Empty;          // "VIGO", "MACK"
         public string DisplayName { get; init; } = string.Empty;
 
         // Carpeta raíz en la biblioteca de documentos de SharePoint.

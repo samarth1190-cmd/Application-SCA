@@ -40,11 +40,11 @@
                                 <TapGestureRecognizer Tapped="OnAtrasSinGuardarClicked" />
                             </Border.GestureRecognizers>
                             <Border.Content>
-                                <Label Text="← Volver" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                <Label x:Name="LblVolverMenuTexto" Text="← Volver" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                             </Border.Content>
                         </Border>
 
-                        <Border Grid.Column="1" x:Name="BtnSalirRojo" 
+                        <Border Grid.Column="1" x:Name="BtnSalirRojo"
                                 HeightRequest="30" WidthRequest="80" HorizontalOptions="End"
                                 BackgroundColor="#E53935" Stroke="#E53935" StrokeThickness="1.5">
                             <Border.StrokeShape>
@@ -54,7 +54,7 @@
                                 <TapGestureRecognizer Tapped="OnVolverClicked" />
                             </Border.GestureRecognizers>
                             <Border.Content>
-                                <Label Text="✕ Salir" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                <Label x:Name="LblSalirTexto" Text="✕ Salir" TextColor="White" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                             </Border.Content>
                         </Border>
                     </Grid>
@@ -82,7 +82,7 @@
                                 <Label FontSize="13" VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <Span Text="Modelo: " TextColor="White"/>
+                                            <Span x:Name="LblModeloPrefijo" Text="Modelo: " TextColor="White"/>
                                             <Span x:Name="LblModeloText" Text="..." TextColor="White" FontAttributes="Bold" />
                                         </FormattedString>
                                     </Label.FormattedText>
@@ -91,7 +91,7 @@
                                 <Label FontSize="13" VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <Span Text="Motor: " TextColor="#B3FFFFFF" />
+                                            <Span x:Name="LblMotorPrefijo" Text="Motor: " TextColor="#B3FFFFFF" />
                                             <Span x:Name="LblMotorText" Text="..." TextColor="White" FontAttributes="Bold" />
                                         </FormattedString>
                                     </Label.FormattedText>
@@ -256,7 +256,7 @@
                                                 <Shadow Brush="Black" Offset="0,5" Radius="10" Opacity="0.3"/>
                                             </Border.Shadow>
                                             <Border.Content>
-                                                <Label Text="VALIDAR Y CONTINUAR" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" CharacterSpacing="1"/>
+                                                <Label x:Name="LblValidarYContinuar" Text="VALIDAR Y CONTINUAR" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" CharacterSpacing="1"/>
                                             </Border.Content>
                                         </Border>
 
@@ -281,18 +281,32 @@
                                                 </Border.Shadow>
                                                 <Border.Content>
                                                     <Grid ColumnDefinitions="Auto, *" ColumnSpacing="12">
-                                                        <Label Grid.Column="0" Text="▶" 
-                                                               IsVisible="{Binding EsActivo}" 
-                                                               TextColor="#CACACA" 
-                                                               VerticalOptions="Center" 
+                                                        <Label Grid.Column="0" Text="▶"
+                                                               IsVisible="{Binding EsActivo}"
+                                                               TextColor="#CACACA"
+                                                               VerticalOptions="Center"
                                                                FontSize="12"/>
-                                                        <Label Grid.Column="1" Text="{Binding TextoInstruccion}" 
-                                                               TextColor="{Binding TextoColor}" 
-                                                               FontSize="13" 
-                                                               FontAttributes="{Binding AtributoLetra}"
-                                                               LineBreakMode="WordWrap" 
-                                                               HorizontalTextAlignment="Justify"
-                                                               VerticalOptions="Center"/>
+                                                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                                            <Label Text="{Binding TextoInstruccion}"
+                                                                   TextColor="{Binding TextoColor}"
+                                                                   FontSize="13"
+                                                                   FontAttributes="{Binding AtributoLetra}"
+                                                                   LineBreakMode="WordWrap"
+                                                                   HorizontalTextAlignment="Justify"
+                                                                   VerticalOptions="Center"/>
+                                                            <Label Text="{Binding FaseTexto}"
+                                                                   IsVisible="{Binding TieneFase}"
+                                                                   TextColor="#8FA3AD"
+                                                                   FontSize="11"
+                                                                   FontAttributes="Italic"
+                                                                   LineBreakMode="WordWrap"/>
+                                                            <Label Text="{Binding AudioFormacionTexto}"
+                                                                   IsVisible="{Binding TieneAudioFormacion}"
+                                                                   TextColor="#8FA3AD"
+                                                                   FontSize="11"
+                                                                   FontAttributes="Italic"
+                                                                   LineBreakMode="WordWrap"/>
+                                                        </VerticalStackLayout>
                                                     </Grid>
                                                 </Border.Content>
                                             </Border>
@@ -356,7 +370,7 @@
             </Border.GestureRecognizers>
             <Border.Content>
                 <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
-                    <Label Text="FINALIZAR ESTÁNDAR" TextColor="White" FontSize="14" VerticalOptions="Center" CharacterSpacing="1"/>
+                    <Label x:Name="LblFinalizarEstandar" Text="FINALIZAR ESTÁNDAR" TextColor="White" FontSize="14" VerticalOptions="Center" CharacterSpacing="1"/>
                 </HorizontalStackLayout>
             </Border.Content>
         </Border>
@@ -398,10 +412,10 @@
                         </Border.StrokeShape>
                         <Border.Content>
                             <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
-                                <Label Text="DOCUMENTOS" 
-                                       TextColor="#0F2166" 
-                                       FontSize="18" 
-                                       FontAttributes="Bold" 
+                                <Label x:Name="LblDocumentosHeader" Text="DOCUMENTOS"
+                                       TextColor="#0F2166"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
                                        HorizontalOptions="Center" />
                             </VerticalStackLayout>
                         </Border.Content>
@@ -433,11 +447,11 @@
                             <TapGestureRecognizer Tapped="OnCerrarDocumentosClicked" />
                         </Border.GestureRecognizers>
                         <Border.Content>
-                            <Label Text="CERRAR" 
-                                   TextColor="White" 
+                            <Label x:Name="LblCerrarDocumentos" Text="CERRAR"
+                                   TextColor="White"
                                    CharacterSpacing="1"
                                    FontSize="16"
-                                   HorizontalOptions="Center" 
+                                   HorizontalOptions="Center"
                                    VerticalOptions="Center" />
                         </Border.Content>
                     </Border>

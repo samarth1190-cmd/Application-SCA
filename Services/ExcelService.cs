@@ -96,6 +96,7 @@ namespace Aplicacion_SCA.Services
                     var nuevoControl = new ControlFase
                     {
                         NumeroFase = estandarActual.ListaControles.Count + 1,
+                        Fase = worksheet.Cell(fila, 2).GetString().Trim(),
 
                         AudioFormacion = TextoLocalizado(worksheet, fila, cabeceras, "AudioFormacion", sufijo, worksheet.Cell(fila, 3).GetString()),
                         TiempoFormacion = worksheet.Cell(fila, 4).GetString(),

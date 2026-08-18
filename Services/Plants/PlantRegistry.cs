@@ -36,20 +36,20 @@ namespace Aplicacion_SCA.Services.Plants
             SimulatedLongitude = -8.7428
         };
 
-        public static readonly PlantDefinition Mac = new()
+        public static readonly PlantDefinition Mack = new()
         {
-            Code = "MAC",
-            DisplayName = "Stellantis MAC",
-            SharePointRoot = "02_Datos_App_MAC",
-            ResultsListId = "",                                   // pendiente: lista propia de MAC
+            Code = "MACK",
+            DisplayName = "Stellantis MACK",
+            SharePointRoot = "02_Datos_App_MACK",
+            ResultsListId = "",                                   // pendiente: lista propia de MACK
             // VIN ISO de 17 caracteres (sin I, O, Q).
             ChassisPattern = @"^[A-HJ-NPR-Z0-9]{17}$",
             ChassisMaxLength = 17,
             ChassisMinLength = 17,
             MotorKeywords = new MotorKeywordSet
             {
-                Termico = new[] { "gas" },                        // MAC: "GAS"
-                Hibrido = new[] { "hybrid", "hibrid" },           // MAC: "Hybrid"
+                Termico = new[] { "gas" },                        // MACK: "GAS"
+                Hibrido = new[] { "hybrid", "hibrid" },           // MACK: "Hybrid"
                 Electrico = new[] { "electr" }
             },
             VoskModelAsset = "model_en.zip",
@@ -67,7 +67,7 @@ namespace Aplicacion_SCA.Services.Plants
             SimulatedLongitude = -82.9944
         };
 
-        public static readonly IReadOnlyList<PlantDefinition> All = new[] { Vigo, Mac };
+        public static readonly IReadOnlyList<PlantDefinition> All = new[] { Vigo, Mack };
 
         public static PlantDefinition ByCode(string? code) =>
             All.FirstOrDefault(p => p.Code.Equals(code, System.StringComparison.OrdinalIgnoreCase)) ?? Vigo;

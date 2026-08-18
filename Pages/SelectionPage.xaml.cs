@@ -58,9 +58,9 @@ public partial class SelectionPage : ContentPage
         else if (_modoOperativo.Contains("Formacion", StringComparison.OrdinalIgnoreCase))
             modoTraducido = LocalizationService.Translate("BTN_FORMACION");
         else if (_modoOperativo.Contains("SCA", StringComparison.OrdinalIgnoreCase) || _modoOperativo.Contains("CORE_DPV", StringComparison.OrdinalIgnoreCase))
-            modoTraducido = "AUDITORÍA C-DPV";
+            modoTraducido = LocalizationService.Translate("AUDITORIA_CDPV_TITLE");
         else if (_modoOperativo.Equals("RRU", StringComparison.OrdinalIgnoreCase))
-            modoTraducido = "AUDITORÍA RRU";
+            modoTraducido = LocalizationService.Translate("AUDITORIA_RRU_TITLE");
         else
             modoTraducido = _modoOperativo.ToUpper();
 
