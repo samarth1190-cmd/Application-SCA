@@ -34,8 +34,8 @@
 		<ApplicationId>com.companyname.aplicacion_sca</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.7.0</ApplicationDisplayVersion>
-		<ApplicationVersion>8</ApplicationVersion>
+		<ApplicationDisplayVersion>1.7.1</ApplicationDisplayVersion>
+		<ApplicationVersion>9</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
@@ -54,7 +54,14 @@
 		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
 		<OptimizeAssemblies>false</OptimizeAssemblies>
 		<AndroidSupportedAbis>arm64-v8a;armeabi-v7a</AndroidSupportedAbis>
-		<AndroidLinkTool>r8</AndroidLinkTool>
+		<!-- r8 (Java code shrinking) strips com.microsoft.maui.PlatformDispatcher, which
+		     MAUI's native layer only reaches via JNI reflection - r8's static analysis can't
+		     see that use and deletes the class, crashing on startup with ClassNotFoundException.
+		     Disabled rather than chasing Proguard keep-rules; this app isn't size-constrained. -->
+		<AndroidLinkTool>none</AndroidLinkTool>
+		<!-- The .NET IL trimmer (illink) crashes natively on this project's dependency graph
+		     (Vosk/ClosedXML native+reflection-heavy assemblies) when trimming is on. -->
+		<PublishTrimmed>false</PublishTrimmed>
 		<AndroidUseAapt2>true</AndroidUseAapt2>
 		<AndroidZipAlign>true</AndroidZipAlign>
 		<AndroidKeyStore>False</AndroidKeyStore>

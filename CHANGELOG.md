@@ -9,6 +9,40 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.7.1] - 2026-08-18 — Claude (asistencia)
+
+### CORREGIDO — Crash de arranque en la APK de Release (Android)
+- **Causa raíz**: `AndroidLinkTool=r8` (activo solo en Release) eliminaba la
+  clase Java `com.microsoft.maui.PlatformDispatcher`, a la que MAUI solo
+  accede por reflexión JNI en tiempo de ejecución — invisible para el
+  análisis estático de r8, que la borraba por "no usada". Resultado:
+  `java.lang.ClassNotFoundException` envuelta en un
+  `System.TypeInitializationException` de `VisualElement` en cuanto arrancaba
+  la app (pantalla en blanco → cierre inmediato).
+  - Diagnóstico: el runtime de Android/Mono no imprime el `InnerException`
+    real al cruzar el límite JNI (se veía "Unknown Source" en todas las
+    líneas). Hubo que envolver `MauiProgram.CreateMauiApp()` en un
+    try/catch temporal con `Android.Util.Log.Error` para sacar la excepción
+    completa por logcat; ya retirado una vez confirmada la causa.
+  - **Arreglo permanente**: `AndroidLinkTool=none` en el `PropertyGroup` de
+    Release del `.csproj` (en vez de mantener r8 con reglas Proguard
+    frágiles — esta app no tiene restricciones de tamaño de Play Store).
+  - De paso, `PublishTrimmed=false` también quedó fijado en el `.csproj`
+    (antes había que pasarlo por línea de comandos): el IL Trimmer
+    (`illink`) revienta de forma nativa con el grafo de dependencias de este
+    proyecto (Vosk + ClosedXML, mucha reflexión/interop nativo).
+- Verificado con instalación limpia (`adb uninstall` + `adb install`, sin
+  relación de despliegue de desarrollo) en una Samsung Galaxy Tab física:
+  arranca correctamente, sin crash.
+- Nueva APK de Release, autocontenida y portable, en
+  `_APK/Aplicacion_SCA_v1.7.1.apk` (158 MB; sigue firmada con clave de
+  depuración automática, no con `firma_sca.keystore` — ver limitación de
+  firma en 1.7.0). Sustituye a `v1.7.0.apk`, que era en realidad el stub de
+  *Fast Deployment* de una build Debug y **no arrancaba de forma autónoma**
+  (necesitaba el paso de sincronización de `dotnet build -t:Run`).
+
+---
+
 ## [1.7.0] - 2026-08-18 — Claude (asistencia)
 
 ### CAMBIADO
