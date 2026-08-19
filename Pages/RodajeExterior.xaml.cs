@@ -1043,7 +1043,7 @@ public partial class RodajeExterior : ContentPage
 
         if (_estadoActual != EstadoApp.Parado || _indiceActual > 0)
         {
-            bool confirmarSalida = await PedirConfirmacionConTimeout("Cancelar ruta", "¿Deseas volver atrás? Se perderá el progreso de ESTA ruta GPS.", "Sí, volver", "Cancelar");
+            bool confirmarSalida = await PedirConfirmacionConTimeout(LocalizationService.Translate("TITLE_CANCELAR_RUTA"), LocalizationService.Translate("MSG_CANCELAR_RUTA_CONFIRM"), LocalizationService.Translate("BTN_SI_VOLVER"), LocalizationService.Translate("BTN_CANCELAR"));
             if (!confirmarSalida)
             {
                 if (estabaCorriendo) IniciarSecuencia();
@@ -1070,7 +1070,7 @@ public partial class RodajeExterior : ContentPage
         bool estabaCorriendo = _estadoActual == EstadoApp.Corriendo;
         if (estabaCorriendo) PausarSecuencia();
 
-        bool confirmarSalida = await PedirConfirmacionConTimeout("Abortar Auditoría", "¿Estás seguro de que deseas salir? Todo el progreso de TODOS los estándares y el chasis se perderán.", "Sí, abortar", "Cancelar");
+        bool confirmarSalida = await PedirConfirmacionConTimeout(LocalizationService.Translate("TITLE_ABORTAR_AUDITORIA"), LocalizationService.Translate("MSG_ABORTAR_AUDITORIA_TODO_CONFIRM"), LocalizationService.Translate("BTN_SI_ABORTAR"), LocalizationService.Translate("BTN_CANCELAR"));
 
         if (!confirmarSalida)
         {
@@ -1146,7 +1146,7 @@ public partial class RodajeExterior : ContentPage
 
             if (estabaCorriendo)
             {
-                bool confirmar = await PedirConfirmacionConTimeout(_nombreEstandarActual.ToUpper(), "¿Deseas salir antes de que termine?", "Sí, continuar", "No, esperar");
+                bool confirmar = await PedirConfirmacionConTimeout(_nombreEstandarActual.ToUpper(), LocalizationService.Translate("MSG_SALIR_ANTES_TERMINE"), LocalizationService.Translate("BTN_SI_CONTINUAR"), LocalizationService.Translate("BTN_NO_ESPERAR"));
                 if (!confirmar)
                 {
                     IniciarSecuencia();
@@ -1220,7 +1220,7 @@ public partial class RodajeExterior : ContentPage
 
         layout.Children.Add(new Label { Text = titulo, FontAttributes = FontAttributes.Bold, FontSize = 18, TextColor = Color.FromArgb("#E53935"), HorizontalTextAlignment = TextAlignment.Center });
         layout.Children.Add(new Label { Text = mensaje, FontSize = 14, TextColor = Colors.Black, HorizontalTextAlignment = TextAlignment.Center });
-        layout.Children.Add(new Label { Text = "(Cancelando automáticamente en 5s...)", FontSize = 12, TextColor = Colors.Gray, HorizontalTextAlignment = TextAlignment.Center, FontAttributes = FontAttributes.Italic });
+        layout.Children.Add(new Label { Text = LocalizationService.Translate("MSG_CANCELANDO_AUTO"), FontSize = 12, TextColor = Colors.Gray, HorizontalTextAlignment = TextAlignment.Center, FontAttributes = FontAttributes.Italic });
 
         var btnGrid = new Grid { ColumnDefinitions = new ColumnDefinitionCollection { new ColumnDefinition { Width = GridLength.Star }, new ColumnDefinition { Width = GridLength.Star } }, ColumnSpacing = 10, Margin = new Thickness(0, 10, 0, 0) };
 

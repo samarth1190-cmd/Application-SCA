@@ -9,6 +9,22 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.7.2] - 2026-08-18 — Claude (asistencia)
+
+### CORREGIDO
+- Diálogo personalizado de confirmación "Abortar Auditoría" / "Cancelar
+  Fase" / "Cancelar ruta" (el popup con temporizador de 5s que aparece al
+  intentar salir de un paso o de una auditoría) estaba **fijo en español**
+  en `EstandarPage` y `RodajeExterior`, ignorando el idioma seleccionado.
+  Ahora todos los títulos, mensajes y botones de ese diálogo (en las 4
+  variantes usadas: cancelar fase, abortar auditoría en Estándar, cancelar
+  ruta GPS, abortar auditoría en Rodaje) usan `LocalizationService`
+  (ES/EN/FR/DE), igual que el resto de la app.
+- Nueva APK `_APK/Aplicacion_SCA_v1.7.2.apk`, instalada y verificada sin
+  crash en la Samsung Galaxy Tab física.
+
+---
+
 ## [1.7.1] - 2026-08-18 — Claude (asistencia)
 
 ### CORREGIDO — Crash de arranque en la APK de Release (Android)

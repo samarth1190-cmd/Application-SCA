@@ -976,6 +976,72 @@ namespace Aplicacion_SCA.Services
                 { Language.French, "▶ REPRENDRE" },
                 { Language.German, "▶ FORTSETZEN" }
             } },
+            { "BTN_CONTINUAR", new() {
+                { Language.Spanish, "Continuar" },
+                { Language.English, "Continue" },
+                { Language.French, "Continuer" },
+                { Language.German, "Weiter" }
+            } },
+            { "BTN_SI_ABORTAR", new() {
+                { Language.Spanish, "Sí, abortar" },
+                { Language.English, "Yes, abort" },
+                { Language.French, "Oui, abandonner" },
+                { Language.German, "Ja, abbrechen" }
+            } },
+            { "MSG_CANCELANDO_AUTO", new() {
+                { Language.Spanish, "(Cancelando automáticamente en 5s...)" },
+                { Language.English, "(Auto-cancelling in 5s...)" },
+                { Language.French, "(Annulation automatique dans 5s...)" },
+                { Language.German, "(Automatischer Abbruch in 5s...)" }
+            } },
+            { "TITLE_ABORTAR_AUDITORIA", new() {
+                { Language.Spanish, "Abortar Auditoría" },
+                { Language.English, "Abort Audit" },
+                { Language.French, "Abandonner l'Audit" },
+                { Language.German, "Audit Abbrechen" }
+            } },
+            { "TITLE_CANCELAR_FASE", new() {
+                { Language.Spanish, "Cancelar Fase" },
+                { Language.English, "Cancel Phase" },
+                { Language.French, "Annuler la Phase" },
+                { Language.German, "Phase Abbrechen" }
+            } },
+            { "TITLE_CANCELAR_RUTA", new() {
+                { Language.Spanish, "Cancelar ruta" },
+                { Language.English, "Cancel Route" },
+                { Language.French, "Annuler l'Itinéraire" },
+                { Language.German, "Route Abbrechen" }
+            } },
+            { "MSG_CANCELAR_FASE_CONFIRM", new() {
+                { Language.Spanish, "¿Deseas volver al menú de estándares? Se perderá el progreso de esta fase." },
+                { Language.English, "Do you want to go back to the standards menu? Progress on this phase will be lost." },
+                { Language.French, "Voulez-vous revenir au menu des normes ? La progression de cette phase sera perdue." },
+                { Language.German, "Möchten Sie zum Standardmenü zurückkehren? Der Fortschritt dieser Phase geht verloren." }
+            } },
+            { "MSG_ABORTAR_AUDITORIA_CONFIRM", new() {
+                { Language.Spanish, "¿Estás seguro de que deseas salir? Todo el progreso se perderá." },
+                { Language.English, "Are you sure you want to exit? All progress will be lost." },
+                { Language.French, "Êtes-vous sûr de vouloir quitter ? Toute la progression sera perdue." },
+                { Language.German, "Möchten Sie wirklich beenden? Der gesamte Fortschritt geht verloren." }
+            } },
+            { "MSG_CANCELAR_RUTA_CONFIRM", new() {
+                { Language.Spanish, "¿Deseas volver atrás? Se perderá el progreso de ESTA ruta GPS." },
+                { Language.English, "Do you want to go back? Progress on THIS GPS route will be lost." },
+                { Language.French, "Voulez-vous revenir en arrière ? La progression de CET itinéraire GPS sera perdue." },
+                { Language.German, "Möchten Sie zurückgehen? Der Fortschritt DIESER GPS-Route geht verloren." }
+            } },
+            { "MSG_ABORTAR_AUDITORIA_TODO_CONFIRM", new() {
+                { Language.Spanish, "¿Estás seguro de que deseas salir? Todo el progreso de TODOS los estándares y el chasis se perderán." },
+                { Language.English, "Are you sure you want to exit? All progress on ALL standards and the chassis will be lost." },
+                { Language.French, "Êtes-vous sûr de vouloir quitter ? Toute la progression de TOUTES les normes et le châssis seront perdus." },
+                { Language.German, "Möchten Sie wirklich beenden? Der gesamte Fortschritt ALLER Standards und des Fahrgestells geht verloren." }
+            } },
+            { "MSG_SALIR_ANTES_TERMINE", new() {
+                { Language.Spanish, "¿Deseas salir antes de que termine?" },
+                { Language.English, "Do you want to exit before it finishes?" },
+                { Language.French, "Voulez-vous quitter avant la fin ?" },
+                { Language.German, "Möchten Sie vor dem Abschluss beenden?" }
+            } },
             { "BTN_SALIR", new() {
                 { Language.Spanish, "✕ Salir" },
                 { Language.English, "✕ Exit" },

@@ -897,14 +897,14 @@ public partial class EstandarPage : ContentPage
 
         layout.Children.Add(new Label { Text = titulo, FontAttributes = FontAttributes.Bold, FontSize = 18, TextColor = Color.FromArgb("#E53935"), HorizontalTextAlignment = TextAlignment.Center });
         layout.Children.Add(new Label { Text = mensaje, FontSize = 14, TextColor = Colors.Black, HorizontalTextAlignment = TextAlignment.Center });
-        layout.Children.Add(new Label { Text = "(Cancelando automáticamente en 5s...)", FontSize = 12, TextColor = Colors.Gray, HorizontalTextAlignment = TextAlignment.Center, FontAttributes = FontAttributes.Italic });
+        layout.Children.Add(new Label { Text = LocalizationService.Translate("MSG_CANCELANDO_AUTO"), FontSize = 12, TextColor = Colors.Gray, HorizontalTextAlignment = TextAlignment.Center, FontAttributes = FontAttributes.Italic });
 
         var btnGrid = new Grid { ColumnDefinitions = new ColumnDefinitionCollection { new ColumnDefinition { Width = GridLength.Star }, new ColumnDefinition { Width = GridLength.Star } }, ColumnSpacing = 10, Margin = new Thickness(0, 10, 0, 0) };
 
-        var btnCancelar = new Button { Text = "Continuar", BackgroundColor = Colors.LightGray, TextColor = Colors.Black, CornerRadius = 10 };
+        var btnCancelar = new Button { Text = LocalizationService.Translate("BTN_CONTINUAR"), BackgroundColor = Colors.LightGray, TextColor = Colors.Black, CornerRadius = 10 };
         btnCancelar.Clicked += (s, e) => { tcs.TrySetResult(false); };
 
-        var btnSalir = new Button { Text = "Sí, Salir", BackgroundColor = Color.FromArgb("#E53935"), TextColor = Colors.White, CornerRadius = 10 };
+        var btnSalir = new Button { Text = LocalizationService.Translate("BTN_SI_SALIR"), BackgroundColor = Color.FromArgb("#E53935"), TextColor = Colors.White, CornerRadius = 10 };
         btnSalir.Clicked += (s, e) => { tcs.TrySetResult(true); };
 
         btnGrid.Children.Add(btnCancelar);
@@ -952,7 +952,7 @@ public partial class EstandarPage : ContentPage
         {
             if (estabaCorriendo) PausarSecuencia();
 
-            bool confirmar = await PedirConfirmacionConTimeout("Cancelar Fase", "¿Deseas volver al menú de estándares? Se perderá el progreso de esta fase.");
+            bool confirmar = await PedirConfirmacionConTimeout(LocalizationService.Translate("TITLE_CANCELAR_FASE"), LocalizationService.Translate("MSG_CANCELAR_FASE_CONFIRM"));
             if (!confirmar) { if (estabaCorriendo) IniciarSecuencia(); return; }
         }
 
@@ -977,7 +977,7 @@ public partial class EstandarPage : ContentPage
         bool estabaCorriendo = _estadoActual == EstadoApp.Corriendo;
         if (estabaCorriendo) PausarSecuencia();
 
-        bool confirmarSalida = await PedirConfirmacionConTimeout("Abortar Auditoría", "¿Estás seguro de que deseas salir? Todo el progreso se perderá.");
+        bool confirmarSalida = await PedirConfirmacionConTimeout(LocalizationService.Translate("TITLE_ABORTAR_AUDITORIA"), LocalizationService.Translate("MSG_ABORTAR_AUDITORIA_CONFIRM"));
         if (!confirmarSalida)
         {
             if (estabaCorriendo) IniciarSecuencia();
