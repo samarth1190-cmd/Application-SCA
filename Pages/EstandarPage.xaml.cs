@@ -565,7 +565,8 @@ public partial class EstandarPage : ContentPage
                 if (!string.IsNullOrWhiteSpace(textoVoz))
                 {
                     await Task.Delay(500, token);
-                    audioTask = TextToSpeech.Default.SpeakAsync(textoVoz, null, token);
+                    var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
+                    audioTask = TextToSpeech.Default.SpeakAsync(textoVoz, new SpeechOptions { Locale = localeVoz }, token);
                 }
 
                 if (esManual)

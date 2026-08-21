@@ -9,6 +9,31 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.7.3] - 2026-08-21 — Claude (asistencia)
+
+### CORREGIDO — El audio TTS seguía el idioma del teléfono, no el de la app
+- **Causa raíz**: cada llamada a `TextToSpeech.Default.SpeakAsync(texto, null,
+  token)` pasaba `null` como `SpeechOptions`, así que el motor de voz del
+  dispositivo elegía el idioma/voz por su propia cuenta — que en la práctica
+  es el idioma por defecto del sistema operativo del teléfono, no el idioma
+  seleccionado dentro de la app. El texto en pantalla ya respetaba el idioma
+  de la app correctamente; solo la voz que lo leía ignoraba esa selección.
+  Resultado reportado: con el teléfono en alemán, seleccionar inglés en la
+  app seguía leyendo el texto (correcto, en inglés) con voz/acento alemán.
+- **Arreglo**: nuevo `Services/SpeechLocaleHelper.cs`, que resuelve el
+  `Locale` de TTS a partir de `LocalizationService.CurrentLanguage` (el
+  idioma elegido en la app) contra `TextToSpeech.Default.GetLocalesAsync()`,
+  con caché simple invalidada solo si cambia el idioma de la app. Se pasa
+  explícitamente en las 4 llamadas reales de voz (`EstandarPage`,
+  `RodajeExterior` ×2, `ControlJapon`), nunca `null`.
+- Comportamiento esperado ahora: el audio suena en el idioma elegido en la
+  app, sin importar el idioma por defecto configurado en el teléfono.
+- Nueva APK `_APK/Aplicacion_SCA_v1.7.3.apk`. Pendiente de verificar en
+  dispositivo físico con el teléfono en alemán (no había ningún dispositivo
+  conectado en el momento de compilar este arreglo).
+
+---
+
 ## [1.7.2] - 2026-08-18 — Claude (asistencia)
 
 ### CORREGIDO

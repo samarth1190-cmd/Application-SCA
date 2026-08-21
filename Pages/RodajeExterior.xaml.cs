@@ -613,7 +613,8 @@ public partial class RodajeExterior : ContentPage
                     try
                     {
                         await Task.Delay(300, token);
-                        await TextToSpeech.Default.SpeakAsync(textoVoz, null, token);
+                        var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
+                        await TextToSpeech.Default.SpeakAsync(textoVoz, new SpeechOptions { Locale = localeVoz }, token);
                     }
                     catch { }
                 }
@@ -687,7 +688,8 @@ public partial class RodajeExterior : ContentPage
             try
             {
                 await Task.Delay(200, token);
-                await TextToSpeech.Default.SpeakAsync(PlantContext.Current.TtsWaitPhrase, null, token);
+                var localeEspera = await SpeechLocaleHelper.GetLocaleAsync();
+                await TextToSpeech.Default.SpeakAsync(PlantContext.Current.TtsWaitPhrase, new SpeechOptions { Locale = localeEspera }, token);
             }
             catch { }
         }
