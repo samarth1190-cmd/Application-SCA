@@ -39,6 +39,10 @@ public partial class EstandarPage : ContentPage
 
     private bool _esperandoValidacionManual = false;
     private bool _bloqueoAccion = false;
+    private bool _masDetallePulsado = false;
+
+    private const int EsperaTrasInstruccionMs = 3000;
+    private const int EsperaExtraMasDetalleMs = 3000;
 
     private Vosk.Model? _voskModel;
     private VoskRecognizer? _rec;
@@ -363,30 +367,37 @@ public partial class EstandarPage : ContentPage
             if (_indiceActual >= _pasosReales.Count) _indiceActual = 0;
         }
 
-        ActualizarListaVisual();
         ActualizarTextosPaso();
         ActualizarBarraYTiempo();
     }
 
-    private void ActualizarListaVisual()
+    private void ActualizarInstruccionActual()
     {
-        if (_pasosReales == null) return;
-        var listaVisual = new List<ItemTextoAudio>();
+        if (_pasosReales == null || _indiceActual >= _pasosReales.Count) return;
+        var paso = _pasosReales[_indiceActual];
 
-        for (int i = 0; i < _pasosReales.Count; i++)
-        {
-            var paso = _pasosReales[i];
-            string texto = (_esFormacion ? paso.AudioFormacion : paso.AudioAuditoria) ?? string.Empty;
+        _masDetallePulsado = false;
 
-            listaVisual.Add(new ItemTextoAudio
-            {
-                TextoInstruccion = texto,
-                Fase = paso.Fase,
-                AudioFormacion = paso.AudioFormacion,
-                EsActivo = (i == _indiceActual)
-            });
-        }
-        BindableLayout.SetItemsSource(ContenedorTextosAudio, listaVisual);
+        LblFaseTitulo.Text = !string.IsNullOrWhiteSpace(paso.Fase) ? paso.Fase : _nombreEstandarActual;
+        LblInstruccionActual.Text = (_esFormacion ? paso.AudioFormacion : paso.AudioAuditoria) ?? string.Empty;
+
+        bool tieneDetalle = !string.IsNullOrWhiteSpace(paso.AudioFormacion);
+        BtnMasDetalle.IsVisible = tieneDetalle;
+        PanelMasDetalle.IsVisible = false;
+        LblMasDetalleTexto.Text = LocalizationService.Translate("BTN_MAS_DETALLE");
+        LblMasDetalleContenido.Text = paso.AudioFormacion ?? string.Empty;
+    }
+
+    private async void OnMasDetalleClicked(object? sender, TappedEventArgs e)
+    {
+        // Solo información visual: nunca interrumpe ni se suma al audio de la instrucción.
+        if (sender is VisualElement btn) await AnimarBoton(btn);
+
+        _masDetallePulsado = true;
+
+        bool mostrando = !PanelMasDetalle.IsVisible;
+        PanelMasDetalle.IsVisible = mostrando;
+        LblMasDetalleTexto.Text = LocalizationService.Translate(mostrando ? "BTN_OCULTAR_DETALLE" : "BTN_MAS_DETALLE");
     }
 
     private async Task AnimarBoton(VisualElement? boton)
@@ -464,7 +475,7 @@ public partial class EstandarPage : ContentPage
             if (_indiceActual < _pasosReales.Count - 1)
             {
                 _indiceActual++;
-                GuardarPasoActual(); 
+                GuardarPasoActual();
 
                 ActualizarBarraYTiempo();
                 ActualizarTextosPaso();
@@ -566,7 +577,18 @@ public partial class EstandarPage : ContentPage
                 {
                     await Task.Delay(500, token);
                     var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-                    audioTask = TextToSpeech.Default.SpeakAsync(textoVoz, new SpeechOptions { Locale = localeVoz }, token);
+
+                    async Task ReproducirFaseYTextoAsync()
+                    {
+                        if (!string.IsNullOrWhiteSpace(paso.Fase))
+                        {
+                            await TextToSpeech.Default.SpeakAsync(paso.Fase, new SpeechOptions { Locale = localeVoz }, token);
+                            await Task.Delay(200, token);
+                        }
+                        await TextToSpeech.Default.SpeakAsync(textoVoz, new SpeechOptions { Locale = localeVoz }, token);
+                    }
+
+                    audioTask = ReproducirFaseYTextoAsync();
                 }
 
                 if (esManual)
@@ -612,7 +634,8 @@ public partial class EstandarPage : ContentPage
                     sw.Stop();
                 }
 
-                await Task.Delay(100, token);
+                int esperaAntesDeAvanzar = EsperaTrasInstruccionMs + (_masDetallePulsado ? EsperaExtraMasDetalleMs : 0);
+                await Task.Delay(esperaAntesDeAvanzar, token);
             }
 
             if (!token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
@@ -786,15 +809,11 @@ public partial class EstandarPage : ContentPage
             if (_pasosReales != null && _indiceActual < _pasosReales.Count)
             {
                 LblPasoActual.Text = LocalizationService.TranslateFormat("MSG_PASO_DE", _indiceActual + 1, _pasosReales.Count);
-                ActualizarListaVisual();
+                ActualizarInstruccionActual();
 
-                await Task.Delay(150); 
-                if (ContenedorTextosAudio.Children.Count > _indiceActual)
+                if (ScrollInstrucciones != null)
                 {
-                    if (ContenedorTextosAudio.Children[_indiceActual] is VisualElement tarjetaActiva && ScrollInstrucciones != null)
-                    {
-                        await ScrollInstrucciones.ScrollToAsync(tarjetaActiva, ScrollToPosition.Center, true);
-                    }
+                    await ScrollInstrucciones.ScrollToAsync(0, 0, false);
                 }
             }
         });
@@ -1113,25 +1132,4 @@ public partial class EstandarPage : ContentPage
         return texto.Replace("á", "a").Replace("é", "e").Replace("í", "i")
                     .Replace("ó", "o").Replace("ú", "u").Replace("ñ", "n");
     }
-}
-
-public class ItemTextoAudio
-{
-    public string TextoInstruccion { get; set; } = string.Empty;
-
-    // Referencia visual para el auditor: fase original del Excel y texto de
-    // formación de ese mismo paso, para poder consultarlos mientras suena el audio.
-    public string Fase { get; set; } = string.Empty;
-    public string AudioFormacion { get; set; } = string.Empty;
-    public bool TieneFase => !string.IsNullOrWhiteSpace(Fase);
-    public bool TieneAudioFormacion => !string.IsNullOrWhiteSpace(AudioFormacion);
-    public string FaseTexto => $"{LocalizationService.Translate("LBL_FASE_PREFIJO")}{Fase}";
-    public string AudioFormacionTexto => $"{LocalizationService.Translate("LBL_AUDIOFORMACION_PREFIJO")}{AudioFormacion}";
-
-    public bool EsActivo { get; set; }
-    public Color ColorBorde => EsActivo ? Color.FromArgb("#CACACA") : Color.FromArgb("#00000000");
-    public double GrosorBorde => EsActivo ? 2.0 : 0.0;
-    public Color TextoColor => EsActivo ? Colors.Black : Color.FromArgb("#607D8B");
-    public double OpacidadSombra => EsActivo ? 0.15 : 0.05;
-    public FontAttributes AtributoLetra => EsActivo ? FontAttributes.Bold : FontAttributes.None;
 }

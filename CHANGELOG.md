@@ -9,6 +9,56 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.0] - 2026-08-21 — Claude (asistencia)
+
+### CAMBIADO — Rediseño de EstandarPage (pantalla de instrucción única)
+- Antes se mostraba una lista scrollable con todos los pasos del estándar a
+  la vez (`BindableLayout`). Ahora se muestra **una sola instrucción por
+  página**: "Fase" (columna B) como título principal grande, y el texto de
+  `AudioAuditoria` como instrucción central en negrita y con fuente más
+  grande. El texto de `AudioFormacion` ya no se reproduce ni se muestra
+  automáticamente: queda oculto detrás de un botón "Más Detalle" de solo
+  texto, que al pulsarlo únicamente muestra/oculta el panel — nunca
+  reproduce audio.
+- Botones "Anterior"/"Siguiente" agrandados (35x35 → 50x50, icono 18 → 24)
+  para facilitar el uso en tablet.
+- La **secuencia automática** (avance por voz/temporizado) ahora espera 3
+  segundos tras terminar de hablar antes de avanzar al siguiente paso, y 3
+  segundos adicionales (6 en total) si el auditor pulsó "Más Detalle" en
+  ese paso. Esta espera es exclusiva de la secuencia automática: el botón
+  físico "Siguiente" sigue avanzando sin retraso añadido.
+- Limpieza: eliminado el método `ActualizarListaVisual()` y la clase
+  `ItemTextoAudio`, ya sin uso tras el rediseño.
+
+### CORREGIDO — Solapamientos de layout en Android (AuditModePage)
+- **Cabecera**: con barras de sistema transparentes/edge-to-edge, el botón
+  "Logout" y la campana de notificaciones quedaban debajo de la barra de
+  estado del teléfono/tablet en algunos dispositivos. Nuevo
+  `Platforms/Android/SafeAreaHelper.cs`, que lee la altura real de las
+  barras de sistema (`ViewCompat.GetRootWindowInsets` /
+  `WindowInsetsCompat.Type.SystemBars()`) y ajusta dinámicamente el
+  `Padding` de la cabecera en `OnAppearing` — un valor fijo en dp no sirve
+  para todos los dispositivos (notch, cámara perforada, barra de gestos
+  vs. botones, etc.).
+- **Pie de página**: el texto "Stellantis Vigo - Centro de Control" era una
+  `Label` flotante posicionada de forma absoluta sobre la tarjeta blanca
+  scrollable, así que en pantallas más pequeñas o con más botones dinámicos
+  (SharePoint) quedaba tapado por la lista de modos de auditoría. Primer
+  intento (añadir padding dentro del contenido scrollable) no funcionaba
+  porque el pie era una capa aparte, no parte del contenido. **Arreglo
+  definitivo**: el texto del pie ahora es el último elemento dentro de la
+  propia lista scrollable, en vez de una capa flotante — así nunca puede
+  solaparse con nada, sea cual sea la cantidad de botones cargados.
+- `MainActivity`: `ResizeableActivity = false` para evitar que Samsung
+  ofrezca modo ventana libre/redimensionable (defensa adicional; la causa
+  raíz de la "franja gris" reportada en tablet fue el "Modo Escritorio" de
+  Samsung a nivel de sistema, no del código de la app — se resuelve
+  desactivándolo en Ajustes rápidos del dispositivo).
+- Verificado en tablet físico (Samsung, `SM_X210`): cabecera y pie ya no se
+  solapan con ningún elemento tras el arreglo.
+
+---
+
 ## [1.7.3] - 2026-08-21 — Claude (asistencia)
 
 ### CORREGIDO — El audio TTS seguía el idioma del teléfono, no el de la app

@@ -21,7 +21,7 @@
         </Border>
 
         <Grid>
-            <VerticalStackLayout VerticalOptions="Start" Padding="20,10,20,0" Spacing="10">
+            <VerticalStackLayout x:Name="ContenedorCabecera" VerticalOptions="Start" Padding="20,10,20,0" Spacing="10">
 
                 <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,0">
                     <Border Grid.Column="0" HeightRequest="30" WidthRequest="100" HorizontalOptions="Start"
@@ -120,8 +120,8 @@
 
                     <Border.Content>
                         <ScrollView VerticalScrollBarVisibility="Never">
-                            <VerticalStackLayout Spacing="12" Padding="15">
-                                <Image Source="stellantis.png" 
+                            <VerticalStackLayout x:Name="ContenidoTarjeta" Spacing="12" Padding="15,15,15,20">
+                                <Image Source="stellantis.png"
                                        HeightRequest="35" 
                                        HorizontalOptions="Center" 
                                        Aspect="AspectFit"/>
@@ -280,10 +280,18 @@
                                     </Border.Content>
                                 </Border>
 
-                                <VerticalStackLayout x:Name="ContenedorBotonesDinamicos" 
-                                                     Spacing="12" 
+                                <VerticalStackLayout x:Name="ContenedorBotonesDinamicos"
+                                                     Spacing="12"
                                                      HorizontalOptions="Center">
                                 </VerticalStackLayout>
+
+                                <Label x:Name="LblFooterVersion"
+                                       Text="Stellantis Vigo - Centro de Control"
+                                       FontSize="11"
+                                       TextColor="#325369"
+                                       HorizontalOptions="Center"
+                                       Margin="0,10,0,0"
+                                       FontAttributes="Bold"/>
                             </VerticalStackLayout>
                         </ScrollView>
                     </Border.Content>
@@ -318,15 +326,7 @@
 
         </Grid>
 
-        <Label Text="Stellantis Vigo - Centro de Control"
-               FontSize="11"
-               TextColor="#325369"
-               HorizontalOptions="Center"
-               VerticalOptions="End"
-               Margin="0,0,0,40"
-               FontAttributes="Bold"/>
-
-        <Grid x:Name="OverlayDocumentos" 
+        <Grid x:Name="OverlayDocumentos"
               IsVisible="False" 
               BackgroundColor="#99000000" 
               ZIndex="999">

@@ -66,6 +66,10 @@ public partial class AuditModePage : ContentPage
                 controller.AppearanceLightStatusBars = false;
                 controller.AppearanceLightNavigationBars = false;
             }
+
+            var (insetSuperior, insetInferior) = Platforms.Android.SafeAreaHelper.ObtenerInsetsBarras(window);
+            ContenedorCabecera.Padding = new Thickness(20, 10 + insetSuperior, 20, 0);
+            ContenidoTarjeta.Padding = new Thickness(15, 15, 15, 20 + insetInferior);
         }
 #endif
 

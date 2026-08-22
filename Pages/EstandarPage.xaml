@@ -177,15 +177,15 @@
 
                                         <Grid ColumnDefinitions="*, Auto, *" ColumnSpacing="10" VerticalOptions="Center">
 
-                                            <Border Grid.Column="0" x:Name="BtnAnterior" HeightRequest="35" WidthRequest="35" BackgroundColor="#F0F4F8" StrokeThickness="2" Stroke="#1565C0" HorizontalOptions="End" VerticalOptions="Center">
+                                            <Border Grid.Column="0" x:Name="BtnAnterior" HeightRequest="50" WidthRequest="50" BackgroundColor="#F0F4F8" StrokeThickness="2" Stroke="#1565C0" HorizontalOptions="End" VerticalOptions="Center">
                                                 <Border.StrokeShape>
-                                                    <RoundRectangle CornerRadius="17.5"/>
+                                                    <RoundRectangle CornerRadius="25"/>
                                                 </Border.StrokeShape>
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer Tapped="OnAnteriorClicked"/>
                                                 </Border.GestureRecognizers>
                                                 <Border.Content>
-                                                    <Label Text="⏮" TextColor="#1565C0" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                    <Label Text="⏮" TextColor="#1565C0" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
                                                 </Border.Content>
                                             </Border>
 
@@ -213,15 +213,15 @@
                                                 </Border.Content>
                                             </Border>
 
-                                            <Border Grid.Column="2" x:Name="BtnSiguiente" HeightRequest="35"  WidthRequest="35" BackgroundColor="#F0F4F8" StrokeThickness="2" Stroke="#1565C0" HorizontalOptions="Start" VerticalOptions="Center">
+                                            <Border Grid.Column="2" x:Name="BtnSiguiente" HeightRequest="50" WidthRequest="50" BackgroundColor="#F0F4F8" StrokeThickness="2" Stroke="#1565C0" HorizontalOptions="Start" VerticalOptions="Center">
                                                 <Border.StrokeShape>
-                                                    <RoundRectangle CornerRadius="17.5"/>
+                                                    <RoundRectangle CornerRadius="25"/>
                                                 </Border.StrokeShape>
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer Tapped="OnSiguienteClicked"/>
                                                 </Border.GestureRecognizers>
                                                 <Border.Content>
-                                                    <Label Text="⏭" TextColor="#1565C0" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                    <Label Text="⏭" TextColor="#1565C0" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
                                                 </Border.Content>
                                             </Border>
                                         </Grid>
@@ -265,53 +265,58 @@
                             </Border>
 
                             <ScrollView Grid.Row="2" x:Name="ScrollInstrucciones" Margin="0,0,0,0" VerticalScrollBarVisibility="Never">
-                                <VerticalStackLayout x:Name="ContenedorTextosAudio" Spacing="10" Padding="5,0,5,5">
-                                    <BindableLayout.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border BackgroundColor="White" 
-                                                    Stroke="{Binding ColorBorde}" 
-                                                    StrokeThickness="{Binding GrosorBorde}" 
-                                                    Margin="2,2" 
-                                                    Padding="15,12">
-                                                <Border.StrokeShape>
-                                                    <RoundRectangle CornerRadius="12"/>
-                                                </Border.StrokeShape>
-                                                <Border.Shadow>
-                                                    <Shadow Brush="Black" Offset="0,3" Opacity="{Binding OpacidadSombra}" Radius="5"/>
-                                                </Border.Shadow>
-                                                <Border.Content>
-                                                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="12">
-                                                        <Label Grid.Column="0" Text="▶"
-                                                               IsVisible="{Binding EsActivo}"
-                                                               TextColor="#CACACA"
-                                                               VerticalOptions="Center"
-                                                               FontSize="12"/>
-                                                        <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                                            <Label Text="{Binding TextoInstruccion}"
-                                                                   TextColor="{Binding TextoColor}"
-                                                                   FontSize="13"
-                                                                   FontAttributes="{Binding AtributoLetra}"
-                                                                   LineBreakMode="WordWrap"
-                                                                   HorizontalTextAlignment="Justify"
-                                                                   VerticalOptions="Center"/>
-                                                            <Label Text="{Binding FaseTexto}"
-                                                                   IsVisible="{Binding TieneFase}"
-                                                                   TextColor="#8FA3AD"
-                                                                   FontSize="11"
-                                                                   FontAttributes="Italic"
-                                                                   LineBreakMode="WordWrap"/>
-                                                            <Label Text="{Binding AudioFormacionTexto}"
-                                                                   IsVisible="{Binding TieneAudioFormacion}"
-                                                                   TextColor="#8FA3AD"
-                                                                   FontSize="11"
-                                                                   FontAttributes="Italic"
-                                                                   LineBreakMode="WordWrap"/>
-                                                        </VerticalStackLayout>
-                                                    </Grid>
-                                                </Border.Content>
-                                            </Border>
-                                        </DataTemplate>
-                                    </BindableLayout.ItemTemplate>
+                                <VerticalStackLayout x:Name="ContenedorInstruccionActual" Spacing="12" Padding="5,0,5,10">
+
+                                    <Label x:Name="LblFaseTitulo"
+                                           Text="..."
+                                           TextColor="#0F2166"
+                                           FontSize="21"
+                                           FontAttributes="Bold"
+                                           LineBreakMode="WordWrap"
+                                           HorizontalTextAlignment="Center"/>
+
+                                    <Label x:Name="LblInstruccionActual"
+                                           Text="..."
+                                           TextColor="#263238"
+                                           FontSize="19"
+                                           FontAttributes="Bold"
+                                           LineHeight="1.3"
+                                           LineBreakMode="WordWrap"
+                                           HorizontalTextAlignment="Start"/>
+
+                                    <Border x:Name="BtnMasDetalle"
+                                            IsVisible="False"
+                                            HeightRequest="42"
+                                            StrokeThickness="1.5"
+                                            Stroke="#43AAA0"
+                                            BackgroundColor="#F0FBF9"
+                                            HorizontalOptions="Center"
+                                            Padding="20,0"
+                                            Margin="0,6,0,0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="21"/>
+                                        </Border.StrokeShape>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnMasDetalleClicked"/>
+                                        </Border.GestureRecognizers>
+                                        <Border.Content>
+                                            <Label x:Name="LblMasDetalleTexto" Text="MÁS DETALLE" TextColor="#0F7B6C" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center" CharacterSpacing="0.5"/>
+                                        </Border.Content>
+                                    </Border>
+
+                                    <Border x:Name="PanelMasDetalle"
+                                            IsVisible="False"
+                                            BackgroundColor="#F5F5F5"
+                                            StrokeThickness="0"
+                                            Padding="15,12">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Border.Content>
+                                            <Label x:Name="LblMasDetalleContenido" Text="..." TextColor="#546E7A" FontSize="14" LineBreakMode="WordWrap" HorizontalTextAlignment="Start"/>
+                                        </Border.Content>
+                                    </Border>
+
                                 </VerticalStackLayout>
                             </ScrollView>
 

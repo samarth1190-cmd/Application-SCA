@@ -1066,6 +1066,18 @@ namespace Aplicacion_SCA.Services
                 { Language.French, "Formation : " },
                 { Language.German, "Schulung: " }
             } },
+            { "BTN_MAS_DETALLE", new() {
+                { Language.Spanish, "MÁS DETALLE" },
+                { Language.English, "MORE DETAIL" },
+                { Language.French, "PLUS DE DÉTAILS" },
+                { Language.German, "MEHR DETAILS" }
+            } },
+            { "BTN_OCULTAR_DETALLE", new() {
+                { Language.Spanish, "OCULTAR DETALLE" },
+                { Language.English, "HIDE DETAIL" },
+                { Language.French, "MASQUER LES DÉTAILS" },
+                { Language.German, "DETAILS AUSBLENDEN" }
+            } },
             { "BTN_VALIDAR_CONTINUAR", new() {
                 { Language.Spanish, "VALIDAR Y CONTINUAR" },
                 { Language.English, "VALIDATE AND CONTINUE" },
