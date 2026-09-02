@@ -9,6 +9,40 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.1] - 2026-09-02 — Claude (asistencia)
+
+### CORREGIDO — El audio seguía sonando en el idioma del teléfono, no el de la app (persistía tras 1.7.3)
+- **Reporte**: en un teléfono con el sistema operativo en alemán, seleccionando
+  inglés en la app (probado con planta MACK, C-DPV), el audio seguía sonando
+  en alemán. En un teléfono con el sistema operativo en inglés, todo sonaba
+  correctamente en el idioma elegido.
+- **Causa raíz real**: `SpeechLocaleHelper` (añadido en 1.7.3) resuelve el
+  `Locale` de voz llamando a `TextToSpeech.Default.GetLocalesAsync()` la
+  primera vez que se necesita hablar, y cachea el resultado para el resto de
+  la sesión. Justo al entrar a una pantalla con audio, el motor de TTS del
+  dispositivo puede no haber terminado de inicializarse todavía, así que esa
+  primera llamada puede devolver una lista sin el idioma pedido. El código
+  anterior cacheaba ese fallo como definitivo (`Locale = null` para siempre),
+  y con `Locale = null` el motor usa el idioma por defecto del sistema
+  operativo — en un teléfono en inglés ese fallback "por accidente" es
+  correcto (por eso el bug era invisible ahí); en uno en alemán, no.
+- **Arreglo**: `Services/SpeechLocaleHelper.cs` ahora reintenta una vez tras
+  400 ms si el primer intento no encuentra el idioma (dando tiempo al motor a
+  terminar de inicializarse), solo cachea un resultado **encontrado** (un
+  fallo ya no se guarda como definitivo — la siguiente frase hablada lo
+  reintentará), y usa un `SemaphoreSlim` para que dos resoluciones casi
+  simultáneas (p. ej. "Fase" + texto principal, que ahora se hablan seguidos
+  tras el rediseño de 1.8.0) no se pisen entre sí.
+- **Diagnóstico añadido**: un log Android (`adb logcat -s SCA_TTS`) que
+  registra, cada vez que se resuelve el idioma, qué código se pidió, si se
+  encontró, y cuántos locales reportó el motor — para tener datos reales si
+  el problema reaparece en vez de tener que adivinar de nuevo a ciegas.
+- Pendiente de verificar en el teléfono físico con sistema operativo en
+  alemán que reportó el bug (no había ninguno disponible al compilar este
+  arreglo). Nueva APK `_APK/Aplicacion_SCA_v1.8.1.apk`.
+
+---
+
 ## [1.8.0] - 2026-08-21 — Claude (asistencia)
 
 ### CAMBIADO — Rediseño de EstandarPage (pantalla de instrucción única)
