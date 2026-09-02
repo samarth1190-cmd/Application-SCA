@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Maui.Media;
@@ -102,6 +103,23 @@ namespace Aplicacion_SCA.Services
             {
                 _lock.Release();
             }
+        }
+
+        private static readonly Regex RegexPuntero = new(">+", RegexOptions.Compiled);
+        private static readonly Regex RegexEspacios = new(@"\s+", RegexOptions.Compiled);
+
+        // El contenido del Excel usa ">>" como viñeta/punto de lista dentro del
+        // texto de una misma celda (p.ej. ">> Comprobar presión >> Comprobar
+        // luces"), no como palabra a pronunciar — el motor de TTS lo leía
+        // literalmente ("mayor que mayor que"). Se quita solo del texto que se
+        // envía a hablar; el texto en pantalla no se toca.
+        public static string LimpiarParaVoz(string? texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto)) return texto ?? string.Empty;
+
+            string limpio = RegexPuntero.Replace(texto, " ");
+            limpio = RegexEspacios.Replace(limpio, " ").Trim();
+            return limpio;
         }
     }
 }

@@ -9,6 +9,26 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.3] - 2026-09-02 — Claude (asistencia)
+
+### CORREGIDO — El TTS leía en voz alta los ">>" del Excel como si fueran palabras
+- El contenido del Excel usa ">>" como viñeta/separador de puntos dentro de
+  una misma celda (p.ej. ">> Comprobar presión >> Comprobar luces"), pero el
+  motor de texto a voz lo leía literalmente. Nuevo
+  `SpeechLocaleHelper.LimpiarParaVoz(texto)`, que quita cualquier secuencia
+  de ">" antes de enviar el texto a `SpeakAsync` — el texto en pantalla no
+  se toca, solo lo que se pronuncia. Aplicado en los 4 puntos reales de habla
+  de la app: `EstandarPage` (Fase y "Más Detalle"), `RodajeExterior` y
+  `ControlJapon`, ya que todos leen el mismo tipo de contenido del Excel.
+
+### AÑADIDO — Más variantes de voz para "Más Detalle"
+- `PlantRegistry`: añadidas "detalles"/"mas detalle"/"masdetalle" (Vigo) y
+  "details"/"more detail"/"moredetail" (MACK) al comando `mas_detalle`, para
+  cubrir cómo Vosk puede transcribir la frase completa o pegar las palabras
+  sin espacio.
+
+---
+
 ## [1.8.2] - 2026-09-02 — Claude (asistencia)
 
 ### CAMBIADO — EstandarPage: secuencia manos libres por voz, pensada para auditar mientras se conduce

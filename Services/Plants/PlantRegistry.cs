@@ -30,7 +30,7 @@ namespace Aplicacion_SCA.Services.Plants
                 ("atras",       new[] { "atras", "anterior" }),
                 ("pausa",       new[] { "pausa", "parar" }),
                 ("repite",      new[] { "repetir" }),
-                ("mas_detalle", new[] { "detalle", "explica", "explicame", "informacion" })
+                ("mas_detalle", new[] { "detalle", "detalles", "mas detalle", "masdetalle", "explica", "explicame", "informacion" })
             },
             TtsWaitPhrase = "Espero para continuar.",
             SimulatedLatitude = 42.2037,
@@ -61,7 +61,7 @@ namespace Aplicacion_SCA.Services.Plants
                 ("atras",       new[] { "back", "previous" }),
                 ("pausa",       new[] { "pause", "stop" }),
                 ("repite",      new[] { "repeat" }),
-                ("mas_detalle", new[] { "detail", "explain", "information" })
+                ("mas_detalle", new[] { "detail", "details", "more detail", "moredetail", "explain", "information" })
             },
             TtsWaitPhrase = "Waiting to continue.",
             // Detroit (Mack) — solo para la simulación GPS en Windows.

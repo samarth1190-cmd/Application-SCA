@@ -614,7 +614,7 @@ public partial class RodajeExterior : ContentPage
                     {
                         await Task.Delay(300, token);
                         var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-                        await TextToSpeech.Default.SpeakAsync(textoVoz, new SpeechOptions { Locale = localeVoz }, token);
+                        await TextToSpeech.Default.SpeakAsync(SpeechLocaleHelper.LimpiarParaVoz(textoVoz), new SpeechOptions { Locale = localeVoz }, token);
                     }
                     catch { }
                 }

@@ -415,7 +415,7 @@ public partial class EstandarPage : ContentPage
         try
         {
             var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-            await TextToSpeech.Default.SpeakAsync(textoDetalle, new SpeechOptions { Locale = localeVoz }, token);
+            await TextToSpeech.Default.SpeakAsync(SpeechLocaleHelper.LimpiarParaVoz(textoDetalle), new SpeechOptions { Locale = localeVoz }, token);
         }
         catch (OperationCanceledException) { }
     }
@@ -594,7 +594,7 @@ public partial class EstandarPage : ContentPage
                 {
                     await Task.Delay(500, token);
                     var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-                    await TextToSpeech.Default.SpeakAsync(paso.Fase, new SpeechOptions { Locale = localeVoz }, token);
+                    await TextToSpeech.Default.SpeakAsync(SpeechLocaleHelper.LimpiarParaVoz(paso.Fase), new SpeechOptions { Locale = localeVoz }, token);
                 }
 
                 if (token.IsCancellationRequested || _estadoActual != EstadoApp.Corriendo) break;
