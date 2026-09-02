@@ -4,6 +4,7 @@ obj/
 *.user
 *.user.Backup.tmp
 _APK/
+_QA_Results/
 firma_sca.keystore
 .claude/settings.local.json
 *.lnk
