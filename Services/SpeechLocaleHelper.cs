@@ -121,5 +121,35 @@ namespace Aplicacion_SCA.Services
             limpio = RegexEspacios.Replace(limpio, " ").Trim();
             return limpio;
         }
+
+        // Corta tras ".", "!" o "?" seguido de espacio — conserva el signo de
+        // puntuación en la frase anterior.
+        private static readonly Regex RegexFinFrase = new(@"(?<=[.!?])\s+", RegexOptions.Compiled);
+
+        // Habla texto largo frase por frase, con una pausa entre cada una, en
+        // vez de una sola llamada continua a SpeakAsync. El motor de TTS no
+        // expone control de velocidad (SpeechOptions solo tiene Locale/Pitch/
+        // Volume), así que la forma de que no suene atropellado es meter un
+        // respiro real entre frases en vez de dejar que el motor las encadene.
+        public static async Task HablarConPausasAsync(string? texto, Locale? locale, CancellationToken token, int pausaEntreFrasesMs = 350)
+        {
+            string limpio = LimpiarParaVoz(texto);
+            if (string.IsNullOrWhiteSpace(limpio)) return;
+
+            var frases = RegexFinFrase.Split(limpio)
+                .Select(f => f.Trim())
+                .Where(f => !string.IsNullOrWhiteSpace(f))
+                .ToList();
+
+            if (frases.Count == 0) return;
+
+            for (int i = 0; i < frases.Count; i++)
+            {
+                await TextToSpeech.Default.SpeakAsync(frases[i], new SpeechOptions { Locale = locale }, token);
+
+                if (i < frases.Count - 1)
+                    await Task.Delay(pausaEntreFrasesMs, token);
+            }
+        }
     }
 }

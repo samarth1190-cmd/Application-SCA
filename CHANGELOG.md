@@ -9,6 +9,22 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.4] - 2026-09-02 — Claude (asistencia)
+
+### CAMBIADO — Pausa de 0,35 s entre frases al hablar (sonaba atropellado/rápido)
+- El motor de TTS de MAUI no expone control de velocidad de habla
+  (`SpeechOptions` solo tiene `Locale`/`Pitch`/`Volume`, no `Rate`), así que
+  no se puede simplemente "hablar más despacio". En su lugar, nuevo
+  `SpeechLocaleHelper.HablarConPausasAsync(texto, locale, token)`: separa el
+  texto en frases (corta tras `.`/`!`/`?`) y las habla una a una, con una
+  pausa real de 350 ms entre cada una, en vez de una sola llamada continua
+  que el motor encadena sin respiro.
+- Reemplaza las llamadas directas a `SpeakAsync` en los 4 puntos reales de
+  habla de la app (`EstandarPage`: Fase y "Más Detalle"; `RodajeExterior`;
+  `ControlJapon`) — ya incluye la limpieza de ">>" añadida en v1.8.3.
+
+---
+
 ## [1.8.3] - 2026-09-02 — Claude (asistencia)
 
 ### CORREGIDO — El TTS leía en voz alta los ">>" del Excel como si fueran palabras

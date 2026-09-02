@@ -656,7 +656,7 @@ public partial class ControlJapon : ContentPage
                 {
                     await Task.Delay(500, token);
                     var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-                    audioTask = TextToSpeech.Default.SpeakAsync(SpeechLocaleHelper.LimpiarParaVoz(paso.Audio), new SpeechOptions { Locale = localeVoz }, token);
+                    audioTask = SpeechLocaleHelper.HablarConPausasAsync(paso.Audio, localeVoz, token);
                 }
 
                 if (esManual)
