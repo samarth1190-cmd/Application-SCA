@@ -122,16 +122,25 @@ namespace Aplicacion_SCA.Services
             return limpio;
         }
 
-        // Corta tras ".", "!" o "?" seguido de espacio — conserva el signo de
-        // puntuación en la frase anterior.
-        private static readonly Regex RegexFinFrase = new(@"(?<=[.!?])\s+", RegexOptions.Compiled);
+        // Corta justo después de ".", "!" o "?" (haya o no espacio detrás) y
+        // también por saltos de línea — el "\s*" (no "\s+") es a propósito:
+        // si el Excel no tiene espacio tras el punto, con "\s+" no cortaba
+        // nada y toda la frase se hablaba de un tirón sin pausa alguna.
+        private static readonly Regex RegexFinFrase = new(@"(?<=[.!?])\s*|\n+", RegexOptions.Compiled);
 
         // Habla texto largo frase por frase, con una pausa entre cada una, en
         // vez de una sola llamada continua a SpeakAsync. El motor de TTS no
         // expone control de velocidad (SpeechOptions solo tiene Locale/Pitch/
         // Volume), así que la forma de que no suene atropellado es meter un
         // respiro real entre frases en vez de dejar que el motor las encadene.
-        public static async Task HablarConPausasAsync(string? texto, Locale? locale, CancellationToken token, int pausaEntreFrasesMs = 350)
+        //
+        // Nota: en algunos motores de TTS de Android el callback "OnDone" de
+        // una frase puede llegar justo antes de que termine de sonar del
+        // todo (aunque el audio ya haya terminado de encolarse). El delay se
+        // añade siempre DESPUÉS de que SpeakAsync haya devuelto el control,
+        // nunca en paralelo, para dejarle a la reproducción todo el margen
+        // posible antes de encolar la siguiente frase.
+        public static async Task HablarConPausasAsync(string? texto, Locale? locale, CancellationToken token, int pausaEntreFrasesMs = 500)
         {
             string limpio = LimpiarParaVoz(texto);
             if (string.IsNullOrWhiteSpace(limpio)) return;

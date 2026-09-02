@@ -9,6 +9,22 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.5] - 2026-09-02 — Claude (asistencia)
+
+### CORREGIDO — La pausa entre frases de 1.8.4 no se oía
+- **Causa raíz**: `HablarConPausasAsync` solo cortaba frases con
+  `(?<=[.!?])\s+` — exige que el punto vaya seguido de un espacio. Si en el
+  Excel el texto no tiene ese espacio tras el punto (o usa saltos de línea
+  en vez de puntuación), la expresión no encontraba dónde cortar, todo el
+  texto se trataba como **una sola frase**, y `HablarConPausasAsync` nunca
+  llegaba a insertar ninguna pausa.
+- **Arreglo**: la expresión ahora corta justo después de `.`/`!`/`?` haya o
+  no espacio detrás, y también por saltos de línea (`(?<=[.!?])\s*|\n+`).
+- Pausa subida de 350 ms a **500 ms**, según lo pedido.
+- Nueva APK `_APK/Aplicacion_SCA_v1.8.5.apk`.
+
+---
+
 ## [1.8.4] - 2026-09-02 — Claude (asistencia)
 
 ### CAMBIADO — Pausa de 0,35 s entre frases al hablar (sonaba atropellado/rápido)
