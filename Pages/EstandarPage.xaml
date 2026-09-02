@@ -277,6 +277,7 @@
 
                                     <Label x:Name="LblInstruccionActual"
                                            Text="..."
+                                           IsVisible="False"
                                            TextColor="#263238"
                                            FontSize="19"
                                            FontAttributes="Bold"
@@ -301,19 +302,6 @@
                                         </Border.GestureRecognizers>
                                         <Border.Content>
                                             <Label x:Name="LblMasDetalleTexto" Text="MÁS DETALLE" TextColor="#0F7B6C" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center" CharacterSpacing="0.5"/>
-                                        </Border.Content>
-                                    </Border>
-
-                                    <Border x:Name="PanelMasDetalle"
-                                            IsVisible="False"
-                                            BackgroundColor="#F5F5F5"
-                                            StrokeThickness="0"
-                                            Padding="15,12">
-                                        <Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="12"/>
-                                        </Border.StrokeShape>
-                                        <Border.Content>
-                                            <Label x:Name="LblMasDetalleContenido" Text="..." TextColor="#546E7A" FontSize="14" LineBreakMode="WordWrap" HorizontalTextAlignment="Start"/>
                                         </Border.Content>
                                     </Border>
 

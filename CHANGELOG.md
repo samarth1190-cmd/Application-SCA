@@ -9,6 +9,55 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.2] - 2026-09-02 — Claude (asistencia)
+
+### CAMBIADO — EstandarPage: secuencia manos libres por voz, pensada para auditar mientras se conduce
+- **Antes**: cada paso hablaba Fase + AudioAuditoria automáticamente y, tras una
+  pausa fija, avanzaba solo al siguiente. El comando de voz solo se escuchaba
+  en los pasos marcados `MANUAL` en el Excel.
+- **Ahora**: por defecto solo se habla la `Fase` (breve). El resto — AudioAuditoria
+  (o AudioFormacion en modo Formación) — solo se dice cuando el auditor lo pide,
+  por voz ("detalle"/"detail" en EN) o tocando "Más Detalle". El paso **nunca
+  avanza solo por temporizador**: solo un comando de voz reconocido ("siguiente"/
+  "next") o el botón físico mueven la auditoría. Decisión explícita del
+  propietario del producto: pensado para poder auditar con las manos en el
+  volante, sin mirar ni tocar la pantalla salvo que el reconocimiento de voz
+  falle.
+- Nuevo comando de voz `mas_detalle` añadido a `PlantRegistry` para ambas
+  plantas (`detalle/explica/informacion` en Vigo, `detail/explain/information`
+  en MACK) — reutiliza el motor Vosk y el flujo de escucha que ya existían
+  para los pasos `MANUAL`, ahora activo en todos los pasos.
+- El botón físico "Más Detalle" y el botón verde "Validar y Continuar" (que
+  aparece mientras se escucha el micrófono) son el equivalente táctil de los
+  comandos de voz — nunca se elimina la vía sin voz, por si el reconocimiento
+  falla o el auditor prefiere tocar la pantalla.
+- **Bug preexistente corregido de paso**: el panel verde "Validar y Continuar"
+  nunca se mostraba mientras se escuchaba porque el código buscaba un control
+  llamado `BtnValidarPaso`, que no existe en el XAML (el control real se llama
+  `PanelValidacionManual`). Corregido para que el indicador visual de "te estoy
+  escuchando" — y su botón físico — aparezcan de verdad.
+- Eliminados los campos y el retraso de 3(+3)s que ya no aplican con este
+  modelo (`_masDetallePulsado`, `EsperaTrasInstruccionMs`,
+  `EsperaExtraMasDetalleMs`) y el panel de texto separado para AudioFormacion
+  (`PanelMasDetalle`/`LblMasDetalleContenido`): ahora "Más Detalle" reutiliza
+  `LblInstruccionActual`, oculto hasta que se pide.
+- **Hallazgo de datos, no de código**: probando contra el Excel real de C-DPV
+  Vigo, la columna "Fase" (columna B) no siempre es un título corto — para
+  varios pasos contiene un párrafo tan largo como AudioAuditoria. El código
+  lee la columna correctamente (columna B, confirmado contra `ExcelService.cs`);
+  si se quiere que el anuncio automático sea realmente breve en todos los
+  pasos, el contenido de esa columna debería revisarse en el Excel, no es algo
+  que el código pueda corregir por sí solo.
+- Verificado en tablet físico (SM_X210) que la secuencia habla la Fase, entra
+  en escucha y responde a un comando reconocido (observado con un falso
+  positivo real de "pausa" por ruido ambiente durante la prueba — riesgo ya
+  existente del reconocimiento por subcadena de Vosk, más expuesto ahora que
+  todos los pasos escuchan). Pendiente de probar en campo con voz real por el
+  auditor — no reproducible por adb.
+- Nueva APK `_APK/Aplicacion_SCA_v1.8.2.apk`.
+
+---
+
 ## [1.8.1] - 2026-09-02 — Claude (asistencia)
 
 ### CORREGIDO — El audio seguía sonando en el idioma del teléfono, no el de la app (persistía tras 1.7.3)

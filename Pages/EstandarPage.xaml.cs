@@ -39,10 +39,11 @@ public partial class EstandarPage : ContentPage
 
     private bool _esperandoValidacionManual = false;
     private bool _bloqueoAccion = false;
-    private bool _masDetallePulsado = false;
 
-    private const int EsperaTrasInstruccionMs = 3000;
-    private const int EsperaExtraMasDetalleMs = 3000;
+    // Comando forzado desde la UI (botón físico "Más Detalle" / "Validar y Continuar")
+    // mientras EjecutarValidacionManual está escuchando el micrófono: se trata
+    // exactamente igual que un comando reconocido por voz.
+    private string? _comandoForzado = null;
 
     private Vosk.Model? _voskModel;
     private VoskRecognizer? _rec;
@@ -371,33 +372,52 @@ public partial class EstandarPage : ContentPage
         ActualizarBarraYTiempo();
     }
 
+    // El "detalle" de un paso es AudioFormacion en modo Formación, AudioAuditoria en
+    // modo auditoría normal — el mismo campo que antes se hablaba automáticamente.
+    // Ahora solo se habla bajo demanda (botón "Más Detalle" o el comando de voz
+    // "detalle"/"detail"): por defecto solo se oye la Fase.
+    private string TextoDetalleDelPaso(ControlFase paso) => (_esFormacion ? paso.AudioFormacion : paso.AudioAuditoria) ?? string.Empty;
+
     private void ActualizarInstruccionActual()
     {
         if (_pasosReales == null || _indiceActual >= _pasosReales.Count) return;
         var paso = _pasosReales[_indiceActual];
 
-        _masDetallePulsado = false;
-
         LblFaseTitulo.Text = !string.IsNullOrWhiteSpace(paso.Fase) ? paso.Fase : _nombreEstandarActual;
-        LblInstruccionActual.Text = (_esFormacion ? paso.AudioFormacion : paso.AudioAuditoria) ?? string.Empty;
 
-        bool tieneDetalle = !string.IsNullOrWhiteSpace(paso.AudioFormacion);
-        BtnMasDetalle.IsVisible = tieneDetalle;
-        PanelMasDetalle.IsVisible = false;
+        LblInstruccionActual.Text = string.Empty;
+        LblInstruccionActual.IsVisible = false;
+
+        BtnMasDetalle.IsVisible = !string.IsNullOrWhiteSpace(TextoDetalleDelPaso(paso));
         LblMasDetalleTexto.Text = LocalizationService.Translate("BTN_MAS_DETALLE");
-        LblMasDetalleContenido.Text = paso.AudioFormacion ?? string.Empty;
     }
 
     private async void OnMasDetalleClicked(object? sender, TappedEventArgs e)
     {
-        // Solo información visual: nunca interrumpe ni se suma al audio de la instrucción.
         if (sender is VisualElement btn) await AnimarBoton(btn);
 
-        _masDetallePulsado = true;
+        // Equivalente táctil del comando de voz "detalle": si la secuencia está
+        // escuchando el micrófono en este momento, se trata exactamente igual
+        // que si el auditor lo hubiera dicho en voz alta.
+        _comandoForzado = "mas_detalle";
+    }
 
-        bool mostrando = !PanelMasDetalle.IsVisible;
-        PanelMasDetalle.IsVisible = mostrando;
-        LblMasDetalleTexto.Text = LocalizationService.Translate(mostrando ? "BTN_OCULTAR_DETALLE" : "BTN_MAS_DETALLE");
+    private async Task MostrarYHablarDetalleAsync(string textoDetalle, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(textoDetalle)) return;
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            LblInstruccionActual.Text = textoDetalle;
+            LblInstruccionActual.IsVisible = true;
+        });
+
+        try
+        {
+            var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
+            await TextToSpeech.Default.SpeakAsync(textoDetalle, new SpeechOptions { Locale = localeVoz }, token);
+        }
+        catch (OperationCanceledException) { }
     }
 
     private async Task AnimarBoton(VisualElement? boton)
@@ -518,7 +538,10 @@ public partial class EstandarPage : ContentPage
     private async void OnValidarManualClicked(object sender, TappedEventArgs e)
     {
         if (sender is VisualElement btn) await AnimarBoton(btn);
-        _esperandoValidacionManual = false;
+
+        // Equivalente táctil del comando de voz "siguiente": fallback físico para
+        // cuando el reconocimiento de voz falla o el auditor prefiere tocar la pantalla.
+        _comandoForzado = "siguiente";
     }
 
     private void DetenerEjecucionAudioYVosk()
@@ -530,9 +553,6 @@ public partial class EstandarPage : ContentPage
         MainThread.BeginInvokeOnMainThread(() => {
             var panelManual = this.FindByName<VisualElement>("PanelValidacionManual");
             if (panelManual != null) panelManual.IsVisible = false;
-
-            var btnManual = this.FindByName<VisualElement>("BtnValidarPaso");
-            if (btnManual != null) btnManual.IsVisible = false;
 
             if (BarraProgreso != null) BarraProgreso.ProgressColor = Color.FromArgb("#243782");
         });
@@ -564,78 +584,55 @@ public partial class EstandarPage : ContentPage
                 _ = AutoGuardadoService.GuardarProgresoAsync();
 
                 var paso = _pasosReales[i];
-                string textoVoz = (_esFormacion ? paso.AudioFormacion : paso.AudioAuditoria) ?? string.Empty;
-                string textoTiempo = (_esFormacion ? paso.TiempoFormacion : paso.TiempoAuditoria) ?? "0";
+                string textoDetalle = TextoDetalleDelPaso(paso);
 
-                bool esManual = textoTiempo.Trim().Equals("MANUAL", StringComparison.OrdinalIgnoreCase);
-                int tiempoPasoSegundos = int.TryParse(textoTiempo.Trim(), out int t) ? t : 0;
-                int tiempoPasoMilisegundos = tiempoPasoSegundos * 1000;
-
-                Task audioTask = Task.CompletedTask;
-
-                if (!string.IsNullOrWhiteSpace(textoVoz))
+                // Por defecto solo se habla la Fase (breve). El resto — el detalle
+                // completo (AudioAuditoria, o AudioFormacion en modo Formación) — solo
+                // se dice cuando el auditor lo pide, por voz ("detalle"/"detail") o
+                // tocando "Más Detalle": pensado para manos libres mientras se conduce.
+                if (!string.IsNullOrWhiteSpace(paso.Fase))
                 {
                     await Task.Delay(500, token);
                     var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-
-                    async Task ReproducirFaseYTextoAsync()
-                    {
-                        if (!string.IsNullOrWhiteSpace(paso.Fase))
-                        {
-                            await TextToSpeech.Default.SpeakAsync(paso.Fase, new SpeechOptions { Locale = localeVoz }, token);
-                            await Task.Delay(200, token);
-                        }
-                        await TextToSpeech.Default.SpeakAsync(textoVoz, new SpeechOptions { Locale = localeVoz }, token);
-                    }
-
-                    audioTask = ReproducirFaseYTextoAsync();
+                    await TextToSpeech.Default.SpeakAsync(paso.Fase, new SpeechOptions { Locale = localeVoz }, token);
                 }
 
-                if (esManual)
+                if (token.IsCancellationRequested || _estadoActual != EstadoApp.Corriendo) break;
+
+                // Escucha indefinida: nunca avanza sola por temporizador. Solo un
+                // comando reconocido (voz o botón físico) mueve la auditoría.
+                string comandoVoz = "";
+                while (string.IsNullOrEmpty(comandoVoz) && !token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
                 {
-                    await audioTask;
+                    comandoVoz = await EjecutarValidacionManual(token);
 
-                    if (token.IsCancellationRequested || _estadoActual != EstadoApp.Corriendo) break;
-
-                    string comandoVoz = "";
-                    while (string.IsNullOrEmpty(comandoVoz) && !token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
+                    if (comandoVoz == "mas_detalle")
                     {
-                        comandoVoz = await EjecutarValidacionManual(token);
-                    }
-
-                    if (token.IsCancellationRequested || _estadoActual != EstadoApp.Corriendo) break;
-
-                    if (comandoVoz == "pausa")
-                    {
-                        MainThread.BeginInvokeOnMainThread(() => PausarSecuencia());
-                        return;
-                    }
-                    else if (comandoVoz == "repite")
-                    {
-                        i--;
-                        await Task.Delay(100, token);
-                        continue;
-                    }
-                    else if (comandoVoz == "atras")
-                    {
-                        if (i > 0) i -= 2; else i = -1;
-                        await Task.Delay(100, token);
-                        continue;
+                        await MostrarYHablarDetalleAsync(textoDetalle, token);
+                        comandoVoz = ""; // seguir escuchando en el mismo paso
                     }
                 }
-                else
+
+                if (token.IsCancellationRequested || _estadoActual != EstadoApp.Corriendo) break;
+
+                if (comandoVoz == "pausa")
                 {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    while (!token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
-                    {
-                        if (audioTask.IsCompleted && (int)sw.ElapsedMilliseconds >= tiempoPasoMilisegundos) break;
-                        await Task.Delay(100, token);
-                    }
-                    sw.Stop();
+                    MainThread.BeginInvokeOnMainThread(() => PausarSecuencia());
+                    return;
                 }
-
-                int esperaAntesDeAvanzar = EsperaTrasInstruccionMs + (_masDetallePulsado ? EsperaExtraMasDetalleMs : 0);
-                await Task.Delay(esperaAntesDeAvanzar, token);
+                else if (comandoVoz == "repite")
+                {
+                    i--;
+                    await Task.Delay(100, token);
+                    continue;
+                }
+                else if (comandoVoz == "atras")
+                {
+                    if (i > 0) i -= 2; else i = -1;
+                    await Task.Delay(100, token);
+                    continue;
+                }
+                // "siguiente" (voz o botón "Validar y Continuar"): cae aquí y el for avanza.
             }
 
             if (!token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
@@ -649,11 +646,12 @@ public partial class EstandarPage : ContentPage
     {
         string comandoDetectado = "";
         _esperandoValidacionManual = true;
+        _comandoForzado = null;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            var btnManual = this.FindByName<VisualElement>("BtnValidarPaso");
-            if (btnManual != null) btnManual.IsVisible = true;
+            var panelManual = this.FindByName<VisualElement>("PanelValidacionManual");
+            if (panelManual != null) panelManual.IsVisible = true;
             if (BarraProgreso != null) BarraProgreso.ProgressColor = Color.FromArgb("#63F86D");
         });
 
@@ -688,6 +686,14 @@ public partial class EstandarPage : ContentPage
 
             while (_esperandoValidacionManual && !token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
             {
+                if (_comandoForzado != null)
+                {
+                    comandoDetectado = _comandoForzado;
+                    _comandoForzado = null;
+                    _esperandoValidacionManual = false;
+                    break;
+                }
+
                 await Task.Delay(50, token);
             }
 
@@ -702,8 +708,18 @@ public partial class EstandarPage : ContentPage
         }
         else
         {
+            // Sin micrófono/modelo Vosk disponible, los botones físicos son la
+            // única forma de avanzar, así que deben seguir funcionando igual.
             while (_esperandoValidacionManual && !token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
             {
+                if (_comandoForzado != null)
+                {
+                    comandoDetectado = _comandoForzado;
+                    _comandoForzado = null;
+                    _esperandoValidacionManual = false;
+                    break;
+                }
+
                 await Task.Delay(200, token);
             }
         }

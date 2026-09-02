@@ -26,10 +26,11 @@ namespace Aplicacion_SCA.Services.Plants
             VoskModelFolder = "model_es",
             VoiceCommands = new List<(string, string[])>
             {
-                ("siguiente", new[] { "sigue", "siguiente", "continuar" }),
-                ("atras",     new[] { "atras", "anterior" }),
-                ("pausa",     new[] { "pausa", "parar" }),
-                ("repite",    new[] { "repetir" })
+                ("siguiente",   new[] { "sigue", "siguiente", "continuar" }),
+                ("atras",       new[] { "atras", "anterior" }),
+                ("pausa",       new[] { "pausa", "parar" }),
+                ("repite",      new[] { "repetir" }),
+                ("mas_detalle", new[] { "detalle", "explica", "explicame", "informacion" })
             },
             TtsWaitPhrase = "Espero para continuar.",
             SimulatedLatitude = 42.2037,
@@ -56,10 +57,11 @@ namespace Aplicacion_SCA.Services.Plants
             VoskModelFolder = "model_en",
             VoiceCommands = new List<(string, string[])>
             {
-                ("siguiente", new[] { "next", "continue" }),
-                ("atras",     new[] { "back", "previous" }),
-                ("pausa",     new[] { "pause", "stop" }),
-                ("repite",    new[] { "repeat" })
+                ("siguiente",   new[] { "next", "continue" }),
+                ("atras",       new[] { "back", "previous" }),
+                ("pausa",       new[] { "pause", "stop" }),
+                ("repite",      new[] { "repeat" }),
+                ("mas_detalle", new[] { "detail", "explain", "information" })
             },
             TtsWaitPhrase = "Waiting to continue.",
             // Detroit (Mack) — solo para la simulación GPS en Windows.
