@@ -84,25 +84,57 @@ function Add-Result {
 # ---------------------------------------------------------------------------
 
 $script:DumpCounter = 0
+$script:ConsecutiveDumpFailures = 0
 
 # Uses a fresh filename (remote and local) on every call. A fixed, reused
 # filename created a write/read race between back-to-back dumps - a dump
 # taken right after typing text could pull a stale or partially-written copy
 # of the PREVIOUS dump, making a just-typed field look untouched even though
 # the tap and text input both landed correctly.
+#
+# Also aborts the whole run fast if the device drops off adb mid-run (this
+# tablet has done that spontaneously more than once): without this, every
+# Wait-AndTapText poll loop would just silently fail against no device and
+# grind through its full timeout doing nothing, over and over, looking like
+# the script "hung" for minutes instead of clearly failing in seconds.
 function Get-UiDump {
-    $script:DumpCounter++
-    $remote = "/sdcard/qa_dump_$($script:DumpCounter).xml"
-    $local = Join-Path $OutDir "_dump_$($script:DumpCounter).xml"
+    for ($attempt = 1; $attempt -le 2; $attempt++) {
+        $script:DumpCounter++
+        $remote = "/sdcard/qa_dump_$($script:DumpCounter).xml"
+        $local = Join-Path $OutDir "_dump_$($script:DumpCounter).xml"
 
-    & $Adb shell uiautomator dump $remote *>$null
-    & $Adb pull $remote $local *>$null
-    & $Adb shell rm $remote *>$null
+        & $Adb shell uiautomator dump $remote *>$null
+        & $Adb pull $remote $local *>$null
+        & $Adb shell rm $remote *>$null
 
-    if (-not (Test-Path $local)) { return $null }
-    $result = [xml](Get-Content $local -Raw -Encoding UTF8)
-    Remove-Item $local -ErrorAction SilentlyContinue
-    return $result
+        if (Test-Path $local) {
+            try {
+                # A dump caught mid screen-transition can pull back truncated
+                # or otherwise malformed XML - [xml] throws a terminating
+                # parse error on that, which nothing downstream expects (the
+                # whole point of returning $null on failure is to let callers
+                # just retry the poll), so it's caught here rather than left
+                # to blow up the run.
+                $result = [xml](Get-Content $local -Raw -Encoding UTF8)
+                Remove-Item $local -ErrorAction SilentlyContinue
+                $script:ConsecutiveDumpFailures = 0
+                return $result
+            } catch {
+                Remove-Item $local -ErrorAction SilentlyContinue
+            }
+        }
+        Start-Sleep -Milliseconds 300
+    }
+
+    $script:ConsecutiveDumpFailures++
+    if ($script:ConsecutiveDumpFailures -ge 5) {
+        $stillThere = & $Adb devices -l 2>$null | Select-String "device product:"
+        if (-not $stillThere) {
+            $script:Results | Export-Csv -Path (Join-Path $OutDir "results.csv") -NoTypeInformation
+            throw "Device disconnected from adb mid-run (5 consecutive dump failures). Reconnect the tablet and re-run - partial results were saved to $OutDir."
+        }
+    }
+    return $null
 }
 
 function Get-NodeCenter {
@@ -128,7 +160,12 @@ function Get-NodeCenter {
 }
 
 function Find-NodeByText {
-    param([Parameter(Mandatory)]$Xml, [Parameter(Mandatory)][string]$Text, [switch]$Contains)
+    # $Xml is deliberately NOT [Parameter(Mandatory)] - Get-UiDump can
+    # transiently return $null (a dump/pull hiccup), and a Mandatory
+    # parameter rejects $null at binding time before this function's own
+    # null-check below ever gets a chance to run, turning a single missed
+    # dump into a hard error instead of "just try again next poll".
+    param($Xml, [Parameter(Mandatory)][string]$Text, [switch]$Contains)
     if (-not $Xml) { return $null }
     $nodes = $Xml.SelectNodes("//node[@text]")
     foreach ($n in $nodes) {
@@ -241,12 +278,22 @@ function Restart-AppIfDead {
     }
 }
 
-# Checks the accumulated logcat buffer (since Clear-Logcat was last called) for
-# a fatal Java crash for our package, and returns the offending lines if any.
+# Checks the accumulated logcat buffer (since Clear-Logcat was last called)
+# for a fatal Java crash for OUR package specifically, and returns the
+# offending lines if any. This is a shared tablet - other apps (Chrome, Gmail,
+# system UI) crashing independently would also write "FATAL EXCEPTION" to the
+# same log, so a bare "FATAL EXCEPTION" match isn't enough: each crash block
+# is a few lines ("FATAL EXCEPTION: main" then "Process: <pkg>, PID: <n>"
+# shortly after), so this only counts a match where the package name actually
+# shows up in that block.
 function Get-CrashSinceMark {
     $log = & $Adb logcat -d -v brief 2>$null
-    $crashLines = $log | Select-String -Pattern "FATAL EXCEPTION", "AndroidRuntime: Process: $AppPackage"
-    return $crashLines
+    $hits = $log | Select-String -Pattern "FATAL EXCEPTION" -Context 0, 6
+    $ours = foreach ($hit in $hits) {
+        $block = @($hit.Line) + @($hit.Context.PostContext)
+        if (($block -join "`n") -match [regex]::Escape($AppPackage)) { $hit }
+    }
+    return $ours
 }
 
 function Clear-Logcat {
@@ -265,8 +312,15 @@ function Checkpoint {
         Add-Result -Name $Name -Status "FAIL" -Detail "App process died" -Screenshot $shot
         Restart-AppIfDead
     } elseif ($crashes) {
-        $first = ($crashes | Select-Object -First 1).ToString()
-        Add-Result -Name $Name -Status "FAIL" -Detail "Crash in logcat: $first" -Screenshot $shot
+        # Persist the full crash block (not just its first line) next to the
+        # screenshot so a real hit is actually debuggable from the report
+        # instead of a one-line summary.
+        $crashLogName = ($Name -replace '[^a-zA-Z0-9_-]', '_') + "_crash.log"
+        $crashLogPath = Join-Path $OutDir $crashLogName
+        $first = $crashes | Select-Object -First 1
+        $fullBlock = @($first.Line) + @($first.Context.PostContext)
+        $fullBlock -join "`n" | Out-File -FilePath $crashLogPath -Encoding UTF8
+        Add-Result -Name $Name -Status "FAIL" -Detail "Crash in logcat for $AppPackage - see $crashLogName" -Screenshot $shot
     } else {
         Add-Result -Name $Name -Status "PASS" -Screenshot $shot
     }
@@ -488,6 +542,150 @@ function Enter-ModelMotorAndStart {
 }
 
 # ---------------------------------------------------------------------------
+# EstandarPage hands-free voice-command flow (v1.8.2+): drives the physical-
+# fallback buttons ("Mas Detalle" / "Validar y Continuar"), which run through
+# the exact same code path as the matching voice commands ("detalle"/
+# "siguiente") - see _comandoForzado in EstandarPage.xaml.cs. adb cannot
+# inject real speech into the mic, so this is the closest thing to an
+# automated test of that flow: it exercises the state machine end to end
+# (listen -> reveal detail -> keep listening -> advance step) without
+# actually needing a human voice.
+# ---------------------------------------------------------------------------
+
+function Test-EstandarPageVoiceFlow {
+    Write-Step "EstandarPage: voice-command flow (COMENZAR -> listen -> detail -> next), physical-fallback buttons"
+
+    # Wrapped in try/finally: several paths below return early on a failed
+    # check, and without a finally, an early return skipped the final
+    # "Pausar" tap - leaving the sequence running/speaking in the background
+    # for the rest of the walk, which then made unrelated later steps
+    # (Test-ResultsSubmission's "Volver" navigation) fight against a live
+    # confirmation dialog they weren't expecting.
+    try {
+        $hasDetailBtn = Wait-AndTapText -Text "DETALLE" -Contains -NoTap -TimeoutSec 3
+        Add-Result -Name "EstandarPage : 'Mas Detalle' button present before starting" -Status $(if ($hasDetailBtn) { "PASS" } else { "WARN" }) -Detail "Only shown if this step has AudioAuditoria/AudioFormacion text"
+
+        $comenzarOk = Wait-AndTapText -Text "COMENZAR" -Contains -TimeoutSec 5
+        Add-Result -Name "EstandarPage : tap COMENZAR (starts hands-free sequence)" -Status $(if ($comenzarOk) { "PASS" } else { "FAIL" })
+        if (-not $comenzarOk) { return }
+
+        # Step 1's Fase can be a long paragraph - this is real TTS speech
+        # taking real wall-clock time on the device speaker (plus the 0.5s
+        # pause now inserted between every sentence), not something that can
+        # be sped up. Give it up to 150s to finish and reach the listening
+        # state (the green "Validar y Continuar" panel), which is when the
+        # physical fallback buttons actually start being consumed by
+        # EjecutarValidacionManual - tapping them before that does nothing.
+        $listening = Wait-AndTapText -Text "VALIDAR Y CONTINUAR" -NoTap -TimeoutSec 150
+        Add-Result -Name "EstandarPage : reaches listening state after speaking Fase" -Status $(if ($listening) { "PASS" } else { "FAIL" }) -Detail $(if (-not $listening) { "Listening indicator not seen within 150s" } else { "" })
+        Checkpoint -Name "estandarpage_listening_state"
+        if (-not $listening) { return }
+
+        # Tap "Mas Detalle" - the physical-fallback equivalent of the voice
+        # command "detalle"/"detail": should speak+reveal AudioAuditoria
+        # without advancing the step or ending the listening loop.
+        $detailTapped = Wait-AndTapText -Text "DETALLE" -Contains -TimeoutSec 3
+        Add-Result -Name "EstandarPage : tap 'Mas Detalle' (voice 'detalle' equivalent)" -Status $(if ($detailTapped) { "PASS" } else { "FAIL" }) -Detail $(if (-not $detailTapped) { "Button not found while listening" } else { "" })
+        Start-Sleep -Seconds 3
+        Checkpoint -Name "estandarpage_more_detail"
+
+        # The detail speech has to finish before listening resumes; then tap
+        # "Validar y Continuar" - the physical-fallback equivalent of the
+        # voice command "siguiente"/"next": should advance step 1 to step 2.
+        $listeningAgain = Wait-AndTapText -Text "VALIDAR Y CONTINUAR" -NoTap -TimeoutSec 90
+        if ($listeningAgain) {
+            Wait-AndTapText -Text "VALIDAR Y CONTINUAR" -TimeoutSec 5 | Out-Null
+            Start-Sleep -Seconds 2
+            $step2 = Wait-AndTapText -Text "Paso 2" -Contains -NoTap -TimeoutSec 5
+            if (-not $step2) { $step2 = Wait-AndTapText -Text "Step 2" -Contains -NoTap -TimeoutSec 3 }
+            Add-Result -Name "EstandarPage : 'Validar y Continuar' advances step (voice 'siguiente' equivalent)" -Status $(if ($step2) { "PASS" } else { "FAIL" })
+        } else {
+            Add-Result -Name "EstandarPage : re-enter listening state after detail" -Status "FAIL" -Detail "Listening indicator not seen within 90s"
+        }
+        Checkpoint -Name "estandarpage_advanced_step"
+    } finally {
+        # Pause so the sequence doesn't keep running/speaking in the
+        # background for the rest of the walk, whichever path got here.
+        Wait-AndTapText -Text "PAUSAR" -Contains -TimeoutSec 3 | Out-Null
+    }
+}
+
+# ---------------------------------------------------------------------------
+# ResultsPage submission flow: VIN entry on MenuEstandarPage -> "Finalizar
+# Auditoria" -> ResultsPage -> "Finalizar y Enviar" -> confirm dialog.
+# ResultsListId is currently empty for both plants (a known, pre-existing gap
+# - see CHANGELOG), so the actual SharePoint list write is expected to fail;
+# what this checks is that the app handles that failure gracefully (an
+# alert, not a crash) rather than whether the write itself succeeds.
+# ---------------------------------------------------------------------------
+
+function Test-ResultsSubmission {
+    param([string]$FlowName)
+
+    Write-Step "$FlowName : VIN entry -> Finalizar Auditoria -> ResultsPage submission"
+
+    # Back out of EstandarPage to MenuEstandarPage first (the VIN field lives
+    # there, not on EstandarPage).
+    Wait-AndTapText -Text "Volver" -Contains -TimeoutSec 3 | Out-Null
+    Start-Sleep -Milliseconds 900
+    Wait-AndTapText -Text ", Salir" -Contains -TimeoutSec 2 | Out-Null
+    Start-Sleep -Seconds 1
+
+    $onMenu = Wait-AndTapText -Text "HOJA DE RUTA" -Contains -NoTap -TimeoutSec 5
+    if (-not $onMenu) { $onMenu = Wait-AndTapText -Text "ROUTE SHEET" -Contains -NoTap -TimeoutSec 3 }
+    if (-not $onMenu) {
+        Add-Result -Name "$FlowName : back on MenuEstandarPage for VIN entry" -Status "FAIL" -Detail "Did not land back on MenuEstandarPage"
+        return
+    }
+
+    # A VIN matching Vigo's chassis pattern is enough to satisfy the length
+    # check in OnFinalizarAuditoriaClicked (2 letters + 6 digits minimum);
+    # exact-pattern validation, if any, happens further down the flow.
+    $xml = Get-UiDump
+    $vinField = $xml.SelectNodes("//node[@class='android.widget.EditText']") | Select-Object -First 1
+    $vinOk = $false
+    if ($vinField) {
+        $c = Get-NodeCenter $vinField
+        & $Adb shell input tap $c.X $c.Y *>$null
+        Start-Sleep -Milliseconds 600
+        & $Adb shell input text "QA123456" *>$null
+        Start-Sleep -Milliseconds 500
+        & $Adb shell input keyevent 4 *>$null
+        Start-Sleep -Milliseconds 500
+        $vinOk = $true
+    }
+    Add-Result -Name "$FlowName : enter VIN" -Status $(if ($vinOk) { "PASS" } else { "FAIL" }) -Detail $(if (-not $vinOk) { "VIN field not found" } else { "" })
+
+    $finalizarTapped = Wait-AndTapText -Text "FINALIZAR AUDITOR" -Contains -TimeoutSec 5
+    Add-Result -Name "$FlowName : tap FINALIZAR AUDITORIA" -Status $(if ($finalizarTapped) { "PASS" } else { "FAIL" })
+    Start-Sleep -Seconds 2
+
+    $onResults = Wait-AndTapText -Text "FINALIZAR Y ENVIAR" -Contains -NoTap -TimeoutSec 8
+    Add-Result -Name "$FlowName : reached ResultsPage" -Status $(if ($onResults) { "PASS" } else { "FAIL" })
+    Checkpoint -Name "$($FlowName)_results_page"
+    if (-not $onResults) { return }
+
+    Wait-AndTapText -Text "FINALIZAR Y ENVIAR" -Contains -TimeoutSec 5 | Out-Null
+    Start-Sleep -Milliseconds 800
+    # Confirm dialog reads "Si, enviar" / "Cancelar" - matched here by the
+    # comma+lowercase tail only, since this script's own source has to stay
+    # ASCII-only (see the encoding note on Return-ToAuditModePage) and can't
+    # hold the accented i.
+    $confirmTapped = Wait-AndTapText -Text ", enviar" -Contains -TimeoutSec 5
+    Add-Result -Name "$FlowName : confirm submission dialog" -Status $(if ($confirmTapped) { "PASS" } else { "WARN" }) -Detail $(if (-not $confirmTapped) { "Confirm dialog not found - VIN validation may have blocked submission first" } else { "" })
+
+    Start-Sleep -Seconds 3
+    $stillAlive = Test-AppAlive
+    Add-Result -Name "$FlowName : app survives submit attempt (expected to fail gracefully, not crash)" -Status $(if ($stillAlive) { "PASS" } else { "FAIL" }) -Detail "ResultsListId is empty for both plants (known gap) - a graceful error alert here is expected, a crash is not"
+
+    # Dismiss whatever alert appears (success or the graceful failure one) so
+    # the walk can continue.
+    Wait-AndTapText -Text "OK" -TimeoutSec 3 | Out-Null
+    Wait-AndTapText -Text "ENTENDIDO" -Contains -TimeoutSec 2 | Out-Null
+    Checkpoint -Name "$($FlowName)_after_submit_attempt"
+}
+
+# ---------------------------------------------------------------------------
 # C-DPV flow (plant-aware)
 # ---------------------------------------------------------------------------
 
@@ -508,6 +706,11 @@ if (Wait-AndTapText -Text "C-DPV" -TimeoutSec 5) {
                     if (-not $onStandard) { $onStandard = Wait-AndTapText -Text "STEP" -Contains -NoTap -TimeoutSec 3 }
                     Add-Result -Name "C-DPV : EstandarPage renders (step counter visible)" -Status $(if ($onStandard) { "PASS" } else { "FAIL" })
                     Checkpoint -Name "cdpv_estandar_page"
+
+                    if ($onStandard) {
+                        Test-EstandarPageVoiceFlow
+                        Test-ResultsSubmission -FlowName "C-DPV"
+                    }
                     break
                 }
             }
@@ -568,6 +771,39 @@ if (Wait-AndTapText -Text "FORMACI" -Contains -TimeoutSec 5) {
     Enter-ModelMotorAndStart -FlowName "Formacion" | Out-Null
 } else {
     Add-Result -Name "Enter Formacion SCA" -Status "FAIL" -Detail "Button not found"
+}
+
+Write-Step "Returning to AuditModePage"
+$backOk = Return-ToAuditModePage
+Add-Result -Name "Navigate back to AuditModePage (from Formacion)" -Status $(if ($backOk) { "PASS" } else { "FAIL" })
+Checkpoint -Name "back_to_audit_mode_after_formacion"
+
+# ---------------------------------------------------------------------------
+# RRU flow (conditional: button only exists if 07_RRU/RRU.xlsx is present in
+# SharePoint - $hasRRU was recorded earlier from the AuditModePage button
+# inventory). Goes SelectionPage -> RRUPage directly, same shape as Control
+# Japon, no MenuEstandarPage in between.
+# ---------------------------------------------------------------------------
+
+Write-Step "=== Flow: RRU ==="
+if ($hasRRU) {
+    if (Wait-AndTapText -Text "RRU" -TimeoutSec 5) {
+        Add-Result -Name "Enter RRU" -Status "PASS"
+        if (Enter-ModelMotorAndStart -FlowName "RRU") {
+            $onRRUPage = Wait-AndTapText -Text "VALIDAR PARADA" -Contains -NoTap -TimeoutSec 8
+            Add-Result -Name "RRU : reached RRUPage" -Status $(if ($onRRUPage) { "PASS" } else { "FAIL" })
+            Checkpoint -Name "rru_page"
+        }
+    } else {
+        Add-Result -Name "Enter RRU" -Status "FAIL" -Detail "Button was present in inventory but not found now"
+    }
+
+    Write-Step "Returning to AuditModePage"
+    $backOk = Return-ToAuditModePage
+    Add-Result -Name "Navigate back to AuditModePage (from RRU)" -Status $(if ($backOk) { "PASS" } else { "FAIL" })
+    Checkpoint -Name "back_to_audit_mode_after_rru"
+} else {
+    Add-Result -Name "Enter RRU" -Status "WARN" -Detail "RRU button not present in this SharePoint content - skipped"
 }
 
 # ---------------------------------------------------------------------------
