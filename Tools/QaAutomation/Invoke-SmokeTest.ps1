@@ -376,6 +376,17 @@ Write-Step "Locking device orientation for the run (was auto-rotating, causing s
 & $Adb shell settings put system user_rotation 0 *>$null
 Start-Sleep -Milliseconds 500
 
+# The tablet has disconnected from adb mid-run more than once, and it
+# clusters around the long TTS-playback waits (up to 150s with zero touch
+# input) rather than happening randomly - consistent with the screen timing
+# out and the device dropping into a deeper power-saving state that also
+# takes USB/adb down with it. "svc power stayon usb" keeps the screen (and
+# with it, apparently, the adb connection) awake for as long as USB stays
+# plugged in, which a real auditor's tablet wouldn't need but this
+# unattended automated run does.
+Write-Step "Keeping screen awake while USB-connected (disconnects were clustering around long no-touch waits)"
+& $Adb shell svc power stayon usb *>$null
+
 Clear-Logcat
 
 if (-not $SkipClear) {
@@ -448,6 +459,7 @@ if (-not $onAuditModePage) {
     Write-Host "Could not reach AuditModePage - aborting the rest of the walk." -ForegroundColor Red
     $script:Results | Export-Csv -Path (Join-Path $OutDir "results.csv") -NoTypeInformation
     & $Adb shell settings put system accelerometer_rotation 1 *>$null
+& $Adb shell svc power stayon false *>$null
     return
 }
 
@@ -839,3 +851,4 @@ Write-Host "  Screenshots + CSV: $OutDir" -ForegroundColor Cyan
 Write-Host "=========================================" -ForegroundColor Cyan
 
 & $Adb shell settings put system accelerometer_rotation 1 *>$null
+& $Adb shell svc power stayon false *>$null
