@@ -344,7 +344,24 @@ function Return-ToAuditModePage {
     param([int]$MaxHops = 8)
     for ($i = 0; $i -lt $MaxHops; $i++) {
         if (Wait-AndTapText -Text "C-DPV" -NoTap -TimeoutSec 2) { return $true }
-        Wait-AndTapText -Text "Volver" -Contains -TimeoutSec 3 | Out-Null
+
+        # A page can be sitting behind a plain info dialog (e.g. ResultsPage's
+        # "Exito / Auditoria finalizada y guardada correctamente" success
+        # alert, seen when a submission that used to fail gracefully due to
+        # an empty SharePoint ResultsListId now succeeds) - nothing below
+        # this dismisses a bare "OK" alert, so without this the loop just
+        # spins against it until MaxHops runs out.
+        Wait-AndTapText -Text "OK" -TimeoutSec 1 | Out-Null
+
+        $tappedVolver = Wait-AndTapText -Text "Volver" -Contains -TimeoutSec 3
+        if (-not $tappedVolver) {
+            # Some pages (RRUPage) only expose the red "X Salir"/"X Exit" full
+            # audit-abort button in their header, no lighter "Volver" - that's
+            # still a valid way back for a breadth smoke test, it just needs
+            # its own confirmation handled below like any other exit.
+            Wait-AndTapText -Text "Salir" -Contains -TimeoutSec 2 | Out-Null
+            Wait-AndTapText -Text "Exit" -Contains -TimeoutSec 1 | Out-Null
+        }
         Start-Sleep -Milliseconds 900
         Wait-AndTapText -Text ", Salir" -Contains -TimeoutSec 2 | Out-Null
         Wait-AndTapText -Text ", Exit" -Contains -TimeoutSec 1 | Out-Null
