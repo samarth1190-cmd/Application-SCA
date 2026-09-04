@@ -9,6 +9,38 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.6] - 2026-09-04 — Claude (asistencia)
+
+### AÑADIDO — Número de versión discreto en MainPage y AuditModePage
+- Etiqueta pequeña y de color gris claro en la esquina inferior derecha
+  (p. ej. "v1.8.6"), a propósito nada llamativa — solo para que alguien
+  pueda comprobar si tiene la última versión instalada sin que compita
+  visualmente con el resto de la pantalla.
+- El texto se lee en tiempo de ejecución con
+  `Microsoft.Maui.ApplicationModel.AppInfo.Current.VersionString` (que
+  refleja `ApplicationDisplayVersion` del csproj) en vez de un texto fijo,
+  para que nunca pueda quedar desincronizado del build real instalado.
+- MainPage: nueva etiqueta junto al pie "Stellantis Vigo - QCP/AVCF".
+  AuditModePage: nueva etiqueta justo debajo de "Stellantis Vigo - Centro
+  de Control", dentro del mismo contenido con scroll (mismo patrón que el
+  arreglo del pie de página de la v1.8.0, para no reintroducir el problema
+  de solapamiento de una capa flotante).
+- Nota de build para Windows (no afecta a Android, el objetivo real): en
+  el build de escritorio de Windows, `AppInfo.Current.VersionString`
+  mostró un valor obsoleto ("1.4.0.6") en vez de la versión actual del
+  csproj — parece un manifiesto de paquete de Windows cacheado que no se
+  regeneró en builds incrementales. Como Windows es solo para desarrollo
+  (nunca se distribuye), no se ha investigado más a fondo; en Android el
+  `versionName` se genera de nuevo en cada build a partir de
+  `ApplicationDisplayVersion`, así que no debería verse el mismo problema.
+- Nueva APK `_APK/Aplicacion_SCA_v1.8.6.apk`. Verificado visualmente en el
+  build de Windows (ambas etiquetas se ven correctamente, sin solaparse
+  con nada); pendiente de confirmar en tablet física que Android muestra
+  el número correcto (no había ningún dispositivo conectado al compilar
+  este cambio).
+
+---
+
 ## [1.8.5] - 2026-09-02 — Claude (asistencia)
 
 ### CORREGIDO — La pausa entre frases de 1.8.4 no se oía

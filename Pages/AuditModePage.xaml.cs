@@ -27,6 +27,13 @@ public partial class AuditModePage : ContentPage
     public AuditModePage()
     {
         InitializeComponent();
+
+        // Discreet corner label so someone can check they're on the latest
+        // build without it competing with the actual UI. Read from AppInfo
+        // (which mirrors ApplicationDisplayVersion from the csproj) instead
+        // of a hardcoded string, so it can never drift out of sync with the
+        // build that's actually installed.
+        LblVersion.Text = $"v{AppInfo.Current.VersionString}";
     }
 
     private void ApplyTranslations()

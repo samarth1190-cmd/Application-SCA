@@ -292,6 +292,13 @@
                                        HorizontalOptions="Center"
                                        Margin="0,10,0,0"
                                        FontAttributes="Bold"/>
+
+                                <Label x:Name="LblVersion"
+                                       Text="..."
+                                       FontSize="9"
+                                       TextColor="#B0B8C1"
+                                       HorizontalOptions="End"
+                                       Margin="0,2,5,0"/>
                             </VerticalStackLayout>
                         </ScrollView>
                     </Border.Content>
