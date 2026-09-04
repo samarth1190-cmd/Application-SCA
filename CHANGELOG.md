@@ -9,6 +9,54 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.8.7] - 2026-09-04 — Claude (asistencia)
+
+### AÑADIDO — Porcentaje de progreso por fase en MenuEstandarPage
+- Cada píldora de fase (p. ej. "STATIC") que el auditor ya empezó pero no
+  terminó ahora muestra una segunda línea pequeña bajo el nombre, p. ej.
+  "7% (10/140)" — así, si el auditor sale a mitad de una fase y vuelve más
+  tarde (o al día siguiente), ve de inmediato cuánto le queda sin tener
+  que reabrir la fase para comprobarlo.
+- Se calcula con el mismo dato que ya se usaba para "continuar donde lo
+  dejó" (la clave guardada en `Preferences` por VIN + fase) dividido entre
+  el total real de pasos que se le van a hablar/mostrar a ese auditor para
+  su motor y pista concretos — no el total bruto de filas del Excel, que
+  puede incluir pasos que no aplican a este vehículo.
+- Solo se muestra si la fase no está ya completada (no compite con el
+  check ✓ existente), no está deshabilitada, y hay progreso real (>0);
+  fases de tipo RODAJE (gestionadas por RodajeExterior, que guarda su
+  progreso con una clave de Preferences distinta) no muestran porcentaje
+  para evitar leer una clave que no les corresponde.
+
+### CAMBIADO — "← Volver" en una fase ya no descarta el progreso
+- Antes, el único botón para volver de una fase (p. ej. STATIC) a la
+  lista de fases avisaba "Se perderá el progreso de esta fase" y de
+  verdad lo borraba (ponía el paso guardado a 0) antes de navegar. Eso
+  hacía imposible mostrar ningún % real, porque la única forma de salir
+  de una fase a medias destruía justo el dato que este cambio necesita
+  leer. Se ha comprobado en tablet física: sin este cambio, "← Volver"
+  siempre dejaba el progreso en 0%.
+- Ahora "← Volver" solo para el audio/reconocimiento de voz en curso y
+  navega de vuelta sin preguntar ni borrar nada - el paso ya se guarda
+  en cada avance/retroceso, así que no hay nada que perder. El botón
+  rojo "✕ Salir" (que aborta la auditoría completa) no ha cambiado.
+- Refactor interno: se creó `Services/AuditProgressHelper.cs` como único
+  sitio con la lógica de qué pasos cuentan para un motor/pista/plantilla
+  dados y de qué modo cuenta como "13 columnas" (CORE_DPV/C-DPV/C_DPV/
+  Formacion/SCA). Antes EstandarPage y MenuEstandarPage tenían cada una su
+  propia copia de este filtro, y estaban desincronizadas entre sí
+  (MenuEstandarPage solo reconocía 2 de las 5 variantes de modo que
+  EstandarPage sí reconocía) — se corrige de paso al centralizar.
+- La lista de fases se cargaba una primera vez con el VIN todavía vacío
+  (antes de que el auditor lo escriba), así que el % se quedaba siempre
+  en 0 hasta salir y volver a entrar a la pantalla; ahora se recalcula
+  también al escribir el VIN.
+- Verificado en tablet física (Android) de principio a fin: CDPV → MACK
+  → WD/GAS → VIN de prueba → STATIC (140 pasos) → avanzar 14 pasos (10%)
+  → "← Volver" → la píldora de STATIC muestra "10% (14/140)" → reabrir
+  STATIC retoma en el paso 15, tal y como se pidió.
+- Nueva APK `_APK/Aplicacion_SCA_v1.8.7.apk`.
+
 ## [1.8.6] - 2026-09-04 — Claude (asistencia)
 
 ### AÑADIDO — Número de versión discreto en MainPage y AuditModePage

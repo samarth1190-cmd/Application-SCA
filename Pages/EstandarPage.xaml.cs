@@ -53,7 +53,7 @@ public partial class EstandarPage : ContentPage
     private List<string> _listaPdfsDisponibles = new List<string>();
     private static string _carpetaManualesPdf => PlantContext.ResolvePath("03_Documentos_pdf");
 
-    private string ClaveGuardadoPaso => $"PasoGuardado_{SesionGlobal.ChasisActual ?? "NA"}_{_miIndiceEstandar}";
+    private string ClaveGuardadoPaso => AuditProgressHelper.ClaveGuardadoPaso(SesionGlobal.ChasisActual ?? "NA", _miIndiceEstandar);
 
 #if ANDROID
     private Android.Media.ToneGenerator? _toneGen;
@@ -313,11 +313,7 @@ public partial class EstandarPage : ContentPage
 
     private void CargarDatosEstandarActual()
     {
-        bool esModo13Columnas = _modoOperativo.Contains("CORE_DPV", StringComparison.OrdinalIgnoreCase) ||
-                                _modoOperativo.Contains("C-DPV", StringComparison.OrdinalIgnoreCase) ||
-                                _modoOperativo.Contains("C_DPV", StringComparison.OrdinalIgnoreCase) ||
-                                _modoOperativo.Contains("Formacion", StringComparison.OrdinalIgnoreCase) ||
-                                _modoOperativo.Contains("SCA", StringComparison.OrdinalIgnoreCase);
+        bool esModo13Columnas = AuditProgressHelper.EsModo13Columnas(_modoOperativo);
 
         var listaActiva = esModo13Columnas ? SesionGlobal.Estandares : SesionGlobal.EstandaresDPV;
 
@@ -332,34 +328,7 @@ public partial class EstandarPage : ContentPage
         LblTituloEstandar.Text = _nombreEstandarActual.ToUpper();
 
         var todosLosPasos = estandarActual.ListaControles?.OrderBy(p => p.NumeroFase).ToList();
-
-        if (todosLosPasos != null)
-        {
-            string motorElegido = NormalizarTexto(SesionGlobal.MotorSeleccionado?.ToLower().Trim() ?? "");
-
-            _pasosReales = todosLosPasos.Where(p =>
-            {
-                string texto = (_esFormacion ? p.AudioFormacion : p.AudioAuditoria) ?? string.Empty;
-                if (string.IsNullOrWhiteSpace(texto)) return false;
-
-                var kw = PlantContext.Current.MotorKeywords;
-                bool pasoComun = (p.MotorTermico == 0 && p.MotorHibrido == 0 && p.MotorElectrico == 0);
-                bool esParaEsteMotor = pasoComun ||
-                                       (kw.Termico.Any(k => motorElegido.Contains(k)) && p.MotorTermico == 1) ||
-                                       (kw.Hibrido.Any(k => motorElegido.Contains(k)) && p.MotorHibrido == 1) ||
-                                       (kw.Electrico.Any(k => motorElegido.Contains(k)) && p.MotorElectrico == 1);
-
-                bool esParaEstaPista = !SesionGlobal.EsRodajeExterior
-                                       ? (p.Exterior == 0 || p.Exterior == 1)
-                                       : (p.Exterior == 0 || p.Exterior == 2);
-
-                bool esTipoEstandar = string.IsNullOrEmpty(p.TipoPlantilla) ||
-                                      !p.TipoPlantilla.ToUpper().Contains("RODAJE");
-
-                return esParaEsteMotor && esParaEstaPista && esTipoEstandar;
-
-            }).ToList();
-        }
+        _pasosReales = AuditProgressHelper.FiltrarPasosReales(todosLosPasos, _esFormacion);
 
         if (_pasosReales != null)
         {
@@ -741,7 +710,7 @@ public partial class EstandarPage : ContentPage
                 return;
             }
 
-            string texto = NormalizarTexto(textElement.GetString()?.ToLower().Trim() ?? "");
+            string texto = AuditProgressHelper.NormalizarTexto(textElement.GetString()?.ToLower().Trim() ?? "");
             texto = new string(texto.Where(c => char.IsLetter(c) || char.IsWhiteSpace(c)).ToArray()).Trim();
 
             if (string.IsNullOrWhiteSpace(texto)) return;
@@ -983,18 +952,17 @@ public partial class EstandarPage : ContentPage
 
     private async Task VolverAtrasSinGuardar()
     {
-        bool estabaCorriendo = _estadoActual == EstadoApp.Corriendo;
-        if (_estadoActual != EstadoApp.Parado || _indiceActual > 0)
-        {
-            if (estabaCorriendo) PausarSecuencia();
-
-            bool confirmar = await PedirConfirmacionConTimeout(LocalizationService.Translate("TITLE_CANCELAR_FASE"), LocalizationService.Translate("MSG_CANCELAR_FASE_CONFIRM"));
-            if (!confirmar) { if (estabaCorriendo) IniciarSecuencia(); return; }
-        }
-
-        DetenerSecuencia();
-        LimpiarPasoGuardado(); 
-        AutoGuardadoService.BorrarBackup(); 
+        // El paso actual ya se guarda en cada avance/retroceso (GuardarPasoActual,
+        // llamado desde OnAnteriorClicked/OnSiguienteClicked/PausarSecuencia), así
+        // que salir aquí ya no descarta nada: el auditor puede volver más tarde a
+        // esta fase y seguir justo donde lo dejó. Por eso ya no se pide confirmación
+        // ni se llama a LimpiarPasoGuardado() - y, a propósito, NO se llama a
+        // DetenerSecuencia() (esa pone _indiceActual a 0 y lo guarda así,
+        // pensada para "reiniciar esta fase desde el paso 1", no para salir sin
+        // perder el sitio). Aquí solo se para el audio/reconocimiento de voz.
+        if (_estadoActual == EstadoApp.Corriendo) PausarSecuencia();
+        DetenerEjecucionAudioYVosk();
+        _estadoActual = EstadoApp.Pausado;
 
         await ContenedorTarjeta.FadeTo(0, 300, Easing.CubicIn);
         await Navigation.PopAsync();
@@ -1140,12 +1108,5 @@ public partial class EstandarPage : ContentPage
             await overlayAyuda.FadeTo(0, 200);
             overlayAyuda.IsVisible = false;
         }
-    }
-
-    private string NormalizarTexto(string texto)
-    {
-        if (string.IsNullOrEmpty(texto)) return "";
-        return texto.Replace("á", "a").Replace("é", "e").Replace("í", "i")
-                    .Replace("ó", "o").Replace("ú", "u").Replace("ñ", "n");
     }
 }

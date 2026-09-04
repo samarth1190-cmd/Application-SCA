@@ -288,8 +288,14 @@ public partial class MenuEstandarPage : ContentPage
 
     private void CargarListaEstandares()
     {
-        bool esModo13Columnas = _modo.Contains("CORE_DPV", StringComparison.OrdinalIgnoreCase) ||
-                                _modo.Contains("Formacion", StringComparison.OrdinalIgnoreCase);
+        // Antes solo reconocía "CORE_DPV"/"Formacion" - EstandarPage (la
+        // autoridad real, es la que de verdad decide qué lista de 13 u
+        // 12 columnas usar) también reconoce "C-DPV"/"C_DPV"/"SCA". Con las
+        // dos copias desincronizadas, un modo dinámico con "SCA" en el
+        // nombre habría cargado aquí la lista equivocada.
+        bool esModo13Columnas = AuditProgressHelper.EsModo13Columnas(_modo);
+        bool esFormacion = _modo.Contains("Formacion", StringComparison.OrdinalIgnoreCase);
+        string chasisActual = SesionGlobal.ChasisActual ?? "NA";
 
         var listaActiva = esModo13Columnas ? SesionGlobal.Estandares : SesionGlobal.EstandaresDPV;
 
@@ -335,13 +341,33 @@ public partial class MenuEstandarPage : ContentPage
                 );
             }
 
+            // Progreso ("cuántos pasos ya escuchó/completó el auditor antes de
+            // volver atrás"): solo para fases que de verdad pasan por
+            // EstandarPage - las de RODAJE las gestiona RodajeExterior, que
+            // guarda su propio puntero de reanudación bajo una clave distinta
+            // ("PasoGuardadoRodaje_..."), así que no se puede leer aquí con
+            // esta misma clave sin mostrar un progreso equivocado.
+            int totalPasos = 0;
+            int pasosCompletados = 0;
+            if (!necesitaMapa)
+            {
+                totalPasos = AuditProgressHelper.FiltrarPasosReales(estandar.ListaControles, esFormacion).Count;
+                if (totalPasos > 0)
+                {
+                    int pasoGuardado = AuditProgressHelper.ObtenerPasoGuardado(chasisActual, i);
+                    pasosCompletados = Math.Min(pasoGuardado, totalPasos);
+                }
+            }
+
             _itemsEstandarVisual.Add(new EstandarUIItem
             {
                 Indice = i,
                 Nombre = estandar.NombreEstandar?.ToUpper() ?? $"ESTÁNDAR {i + 1}",
                 EsCompletado = completado,
                 EsRodaje = necesitaMapa,
-                EsDeshabilitado = estaDeshabilitado
+                EsDeshabilitado = estaDeshabilitado,
+                TotalPasos = totalPasos,
+                PasosCompletados = pasosCompletados
             });
         }
     }
@@ -361,6 +387,12 @@ public partial class MenuEstandarPage : ContentPage
         string nuevoChasis = e.NewTextValue?.ToUpper() ?? "";
         SesionGlobal.ChasisActual = nuevoChasis;
         LblChasisText.Text = string.IsNullOrEmpty(nuevoChasis) ? LocalizationService.Translate("MSG_VIN_PENDIENTE") : $"VIN: {nuevoChasis}";
+
+        // El progreso por fase (TotalPasos/PasosCompletados) se calcula por VIN,
+        // y la lista ya se había cargado una vez con el VIN todavía vacío - sin
+        // esto, el % se quedaría siempre en 0 hasta salir y volver a entrar a
+        // esta pantalla.
+        CargarListaEstandares();
     }
 
     private async void OnEstandarTapped(object sender, TappedEventArgs e)
@@ -531,12 +563,42 @@ public class EstandarUIItem : INotifyPropertyChanged
                 OnPropertyChanged(nameof(FondoPildora));
                 OnPropertyChanged(nameof(ColorIcono));
                 OnPropertyChanged(nameof(Icono));
+                OnPropertyChanged(nameof(MostrarProgreso));
             }
         }
     }
 
     private bool _esRodaje;
     public bool EsRodaje { get => _esRodaje; set { _esRodaje = value; OnPropertyChanged(); } }
+
+    // Progreso de un intento anterior sin terminar ("el auditor llegó al
+    // paso 14 de 140 y volvió atrás"). Solo tiene sentido para fases que no
+    // están ya completas ni deshabilitadas - ver MostrarProgreso.
+    private int _pasosCompletados;
+    public int PasosCompletados
+    {
+        get => _pasosCompletados;
+        set { _pasosCompletados = value; OnPropertyChanged(); OnPropertyChanged(nameof(TextoProgreso)); OnPropertyChanged(nameof(MostrarProgreso)); }
+    }
+
+    private int _totalPasos;
+    public int TotalPasos
+    {
+        get => _totalPasos;
+        set { _totalPasos = value; OnPropertyChanged(); OnPropertyChanged(nameof(TextoProgreso)); OnPropertyChanged(nameof(MostrarProgreso)); }
+    }
+
+    public bool MostrarProgreso => !EsCompletado && !EsDeshabilitado && TotalPasos > 0 && PasosCompletados > 0;
+
+    public string TextoProgreso
+    {
+        get
+        {
+            if (TotalPasos <= 0) return string.Empty;
+            int porcentaje = (int)Math.Round(100.0 * PasosCompletados / TotalPasos);
+            return $"{porcentaje}% ({PasosCompletados}/{TotalPasos})";
+        }
+    }
 
     private bool _esDeshabilitado;
     public bool EsDeshabilitado
@@ -552,6 +614,7 @@ public class EstandarUIItem : INotifyPropertyChanged
                 OnPropertyChanged(nameof(ColorIcono));
                 OnPropertyChanged(nameof(Icono));
                 OnPropertyChanged(nameof(OpacidadBoton));
+                OnPropertyChanged(nameof(MostrarProgreso));
             }
         }
     }

@@ -209,14 +209,22 @@
                                             </Border.GestureRecognizers>
                                             <Border.Content>
                                                 <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15" Padding="10,0,20,0">
-                                                    <Label Grid.Column="1" 
-                                                           Text="{Binding Nombre}" 
-                                                           TextColor="White" 
-                                                           FontSize="13" 
-                                                           FontAttributes="Bold" 
+                                                    <VerticalStackLayout Grid.Column="1"
                                                            VerticalOptions="Center"
-                                                           HorizontalOptions="Start"/>
-                                                    <Label Grid.Column="2" 
+                                                           Spacing="1">
+                                                        <Label Text="{Binding Nombre}"
+                                                               TextColor="White"
+                                                               FontSize="13"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Start"/>
+                                                        <Label Text="{Binding TextoProgreso}"
+                                                               IsVisible="{Binding MostrarProgreso}"
+                                                               TextColor="#B3FFFFFF"
+                                                               FontSize="10"
+                                                               FontAttributes="None"
+                                                               HorizontalOptions="Start"/>
+                                                    </VerticalStackLayout>
+                                                    <Label Grid.Column="2"
                                                            Text="{Binding Icono}" 
                                                            TextColor="White" 
                                                            FontSize="16" 
