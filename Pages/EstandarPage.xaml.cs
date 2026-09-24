@@ -1238,16 +1238,49 @@ public partial class EstandarPage : ContentPage
         try
         {
             if (sender is VisualElement border) await AnimarBoton(border);
-            if (_estadoActual == EstadoApp.Corriendo)
+
+            // "Finalizar Estándar" antes marcaba SIEMPRE la fase como 100%
+            // completada al pulsarlo, sin mirar en qué paso estaba el auditor -
+            // salir en el paso 4 de 140 quedaba indistinguible de terminar los
+            // 140. Ahora solo cuenta como completada de verdad si de verdad
+            // llegó al último paso real.
+            bool completoDeVerdad = _pasosReales != null && _pasosReales.Count > 0 &&
+                                     _indiceActual >= _pasosReales.Count - 1;
+
+            if (completoDeVerdad)
             {
-                bool confirmar = await DisplayAlert(LocalizationService.Translate("ALERT_INSTRUCCIONES_CURSO"), LocalizationService.Translate("ALERT_INSTRUCCIONES_CURSO_MSG"), LocalizationService.Translate("BTN_SI_FINALIZAR"), LocalizationService.Translate("BTN_NO_ESPERAR"));
-                if (!confirmar) return;
+                if (_estadoActual == EstadoApp.Corriendo)
+                {
+                    bool confirmar = await DisplayAlert(LocalizationService.Translate("ALERT_INSTRUCCIONES_CURSO"), LocalizationService.Translate("ALERT_INSTRUCCIONES_CURSO_MSG"), LocalizationService.Translate("BTN_SI_FINALIZAR"), LocalizationService.Translate("BTN_NO_ESPERAR"));
+                    if (!confirmar) return;
+                }
+
+                DetenerSecuencia();
+                LimpiarPasoGuardado(); // Ha terminado la fase de verdad, borramos para que la proxima vez empiece en 0
+
+                if (!SesionGlobal.EstandaresCompletados.Contains(_miIndiceEstandar)) SesionGlobal.EstandaresCompletados.Add(_miIndiceEstandar);
             }
+            else
+            {
+                // Salida a medias: ya NO se marca como completada, y el paso
+                // guardado no se toca (GuardarPasoActual ya lo mantiene al día en
+                // cada avance) - así la próxima vez retoma justo donde lo dejó,
+                // en vez de perder el progreso o pasar por completada sin serlo.
+                int total = _pasosReales?.Count ?? 0;
+                int hechos = Math.Min(Math.Max(_indiceActual, 0), total);
+                int porcentaje = total > 0 ? (int)Math.Round(100.0 * hechos / total) : 0;
 
-            DetenerSecuencia();
-            LimpiarPasoGuardado(); // Ha terminado la fase, borramos para que la proxima vez empiece en 0
+                bool confirmarSalida = await DisplayAlert(
+                    LocalizationService.Translate("ALERT_SALIR_PARCIAL"),
+                    LocalizationService.TranslateFormat("ALERT_SALIR_PARCIAL_MSG", porcentaje, hechos, total),
+                    LocalizationService.Translate("BTN_GUARDAR_SALIR"),
+                    LocalizationService.Translate("BTN_NO_ESPERAR"));
+                if (!confirmarSalida) return;
 
-            if (!SesionGlobal.EstandaresCompletados.Contains(_miIndiceEstandar)) SesionGlobal.EstandaresCompletados.Add(_miIndiceEstandar);
+                if (_estadoActual == EstadoApp.Corriendo) PausarSecuencia();
+                DetenerEjecucionAudioYVosk();
+                _estadoActual = EstadoApp.Pausado;
+            }
 
             _ = AutoGuardadoService.GuardarProgresoAsync();
 

@@ -532,6 +532,42 @@ namespace Aplicacion_SCA.Services
                 { Language.French, "Non, attendre" },
                 { Language.German, "Nein, warten" }
             } },
+            { "ALERT_SALIR_PARCIAL", new() {
+                { Language.Spanish, "Fase sin terminar" },
+                { Language.English, "Phase not finished" },
+                { Language.French, "Phase non terminée" },
+                { Language.German, "Phase nicht abgeschlossen" }
+            } },
+            { "ALERT_SALIR_PARCIAL_MSG", new() {
+                { Language.Spanish, "Solo has completado {0}% ({1} de {2} pasos). Se guardará tu progreso para poder continuar más tarde desde aquí." },
+                { Language.English, "You've only completed {0}% ({1} of {2} steps). Your progress will be saved so you can continue from here later." },
+                { Language.French, "Vous n'avez complété que {0}% ({1} sur {2} étapes). Votre progression sera enregistrée pour pouvoir continuer plus tard." },
+                { Language.German, "Sie haben erst {0}% ({1} von {2} Schritten) abgeschlossen. Ihr Fortschritt wird gespeichert, damit Sie später hier weitermachen können." }
+            } },
+            { "BTN_GUARDAR_SALIR", new() {
+                { Language.Spanish, "Guardar y salir" },
+                { Language.English, "Save and exit" },
+                { Language.French, "Enregistrer et quitter" },
+                { Language.German, "Speichern und beenden" }
+            } },
+            { "ALERT_RETOMAR_FASE", new() {
+                { Language.Spanish, "Progreso guardado" },
+                { Language.English, "Progress saved" },
+                { Language.French, "Progression enregistrée" },
+                { Language.German, "Fortschritt gespeichert" }
+            } },
+            { "ALERT_RETOMAR_FASE_MSG", new() {
+                { Language.Spanish, "Ya llevas un {0}% de esta fase ({1} de {2} pasos). ¿Quieres continuar donde lo dejaste o empezar desde cero?" },
+                { Language.English, "You're already {0}% through this phase ({1} of {2} steps). Do you want to continue where you left off, or start from scratch?" },
+                { Language.French, "Vous êtes déjà à {0}% de cette phase ({1} sur {2} étapes). Voulez-vous continuer où vous en étiez ou recommencer à zéro ?" },
+                { Language.German, "Sie sind bereits zu {0}% durch diese Phase ({1} von {2} Schritten). Möchten Sie dort fortfahren, wo Sie aufgehört haben, oder von vorne beginnen?" }
+            } },
+            { "BTN_CONTINUAR_DONDE", new() {
+                { Language.Spanish, "Continuar" },
+                { Language.English, "Resume" },
+                { Language.French, "Continuer" },
+                { Language.German, "Fortsetzen" }
+            } },
 
             // ResultsPage
             { "ALERT_FORMATO_INVALIDO", new() {

@@ -9,6 +9,46 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.9.2] - 2026-09-24 — Claude (asistencia)
+
+### CORREGIDO — "Finalizar Estándar" marcaba 100% aunque solo se hubiera hecho una parte
+- **Causa raíz**: `OnContinuarClicked` (el botón "FINALIZAR ESTÁNDAR"), al
+  pulsarlo, marcaba SIEMPRE la fase como completada
+  (`SesionGlobal.EstandaresCompletados.Add(...)`) y borraba el paso
+  guardado (`LimpiarPasoGuardado()`) - sin mirar en qué paso estaba
+  realmente el auditor. Salir en el paso 5 de 124 quedaba indistinguible
+  de terminar los 124: mismo check ✓ en la lista de fases, mismo "próxima
+  vez empieza en el paso 1".
+- **Arreglo**: solo cuenta como completada de verdad si el auditor llegó
+  de verdad al último paso real (`_indiceActual >= _pasosReales.Count -
+  1`). Si no, ahora se avisa con el % real ("Solo has completado 4% (5 de
+  124 pasos)...") y se guarda el progreso tal cual estaba - sin marcar
+  check, sin tocar el paso guardado (ya se mantiene al día solo, en cada
+  avance) - en vez de la pregunta anterior, que solo miraba si el audio
+  seguía sonando ("¿seguro que quieres finalizar?"), nunca cuántos pasos
+  quedaban.
+
+### AÑADIDO — Preguntar "¿Continuar o empezar de cero?" al reabrir una fase a medias
+- Antes, reabrir una fase con progreso guardado (no completada) retomaba
+  en silencio en el paso guardado. Ahora se pregunta primero: "Ya llevas
+  un X% de esta fase (Y de Z pasos). ¿Quieres continuar donde lo dejaste
+  o empezar desde cero?" - igual que ya se preguntaba para una fase
+  *completada* ("¿seguro que quieres repetirla?"), pero para el caso de
+  progreso parcial. Elegir "Empezar de cero" borra el paso guardado de
+  esa fase antes de entrar.
+- Verificado en tablet física de principio a fin: STATIC (124 pasos) →
+  avanzar 5 pasos → "FINALIZAR ESTÁNDAR" → aviso correcto "4% (5 de 124
+  pasos)" → vuelve a la lista mostrando "4% (5/124)" sin check → reabrir
+  STATIC → pregunta continuar/empezar de cero → "Continuar" retoma en el
+  paso 6 → reabrir de nuevo y elegir "Empezar de cero" → vuelve al paso 1.
+- Nota de compilación: al añadir las traducciones nuevas se duplicó por
+  error la clave `BTN_EMPEZAR_CERO` (ya existía para el diálogo de
+  auditoría interrumpida) - un diccionario con clave duplicada revienta
+  el arranque entero de la app (`TypeInitializationException` en
+  `LocalizationService`, no algo local a esta pantalla). Detectado y
+  corregido antes de subir la build; reutilizada la clave ya existente en
+  vez de duplicarla.
+
 ## [1.9.1] - 2026-09-24 — Claude (asistencia)
 
 ### AÑADIDO — Comando de voz "Requisito de la prueba"

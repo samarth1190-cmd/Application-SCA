@@ -425,6 +425,23 @@ public partial class MenuEstandarPage : ContentPage
                     return;
                 }
             }
+            else if (item.MostrarProgreso)
+            {
+                // Fase sin terminar pero con progreso real guardado: en vez de
+                // retomar en silencio, se pregunta - así queda claro que hay algo
+                // guardado y se puede elegir seguir o arrancar limpio.
+                bool continuar = await DisplayAlert(
+                    LocalizationService.Translate("ALERT_RETOMAR_FASE"),
+                    LocalizationService.TranslateFormat("ALERT_RETOMAR_FASE_MSG",
+                        (int)Math.Round(100.0 * item.PasosCompletados / item.TotalPasos), item.PasosCompletados, item.TotalPasos),
+                    LocalizationService.Translate("BTN_CONTINUAR_DONDE"),
+                    LocalizationService.Translate("BTN_EMPEZAR_CERO"));
+
+                if (!continuar)
+                {
+                    Preferences.Remove(AuditProgressHelper.ClaveGuardadoPaso(SesionGlobal.ChasisActual ?? "NA", item.Indice));
+                }
+            }
 
             SesionGlobal.IndiceEstandarActual = item.Indice;
             _nombreFaseEnCurso = item.Nombre;
