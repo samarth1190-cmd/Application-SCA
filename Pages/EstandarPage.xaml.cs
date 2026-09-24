@@ -42,13 +42,28 @@ public partial class EstandarPage : ContentPage
     // "cambio de sección" en ActualizarInstruccionActual).
     private string _seccionAnterior = string.Empty;
 
-    private bool _esperandoValidacionManual = false;
     private bool _bloqueoAccion = false;
 
-    // Comando forzado desde la UI (botón físico "Más Detalle" / "Validar y Continuar")
-    // mientras EjecutarValidacionManual está escuchando el micrófono: se trata
-    // exactamente igual que un comando reconocido por voz.
+    // Comando forzado desde la UI (botón físico "Más Detalle" / "Validar y Continuar"):
+    // se trata exactamente igual que un comando reconocido por voz.
     private string? _comandoForzado = null;
+
+    // Escucha continua: el micrófono (auriculares Bluetooth) se abre UNA vez al
+    // arrancar la secuencia y se queda abierto durante toda ella, habla incluida,
+    // en vez de abrirse/cerrarse en cada paso. Antes, cada apertura tenía que
+    // renegociar Bluetooth SCO desde cero con una espera fija de 700ms antes de
+    // empezar a grabar; si la negociación real tardaba más, se perdía el
+    // principio de lo que decía el auditor y había que repetirlo. Con esto
+    // también se puede interrumpir la fase hablada diciendo un comando
+    // ("barge-in"): con auriculares Bluetooth el micro no oye lo que suena en
+    // el oído, así que no hay riesgo de eco/falsos positivos.
+    private volatile string _comandoContinuo = "";
+    private bool _escuchaContinuaActiva = false;
+
+    // Token del "await Hablar..." que esté sonando en este momento (Fase o
+    // Más Detalle/Requisito). Se cancela SOLO a él para interrumpir el habla
+    // en curso sin matar toda la secuencia (ese es _cts/token, distinto).
+    private CancellationTokenSource? _speechCts;
 
     private Vosk.Model? _voskModel;
     private VoskRecognizer? _rec;
@@ -409,12 +424,7 @@ public partial class EstandarPage : ContentPage
             LblInstruccionActual.IsVisible = true;
         });
 
-        try
-        {
-            var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-            await SpeechLocaleHelper.HablarConPausasAsync(textoDetalle, localeVoz, token);
-        }
-        catch (OperationCanceledException) { }
+        await HablarInterrumpible(textoDetalle, token);
     }
 
     private async Task AnimarBoton(VisualElement? boton)
@@ -562,8 +572,9 @@ public partial class EstandarPage : ContentPage
 
     private void DetenerEjecucionAudioYVosk()
     {
-        _esperandoValidacionManual = false;
         _cts?.Cancel();
+        try { _speechCts?.Cancel(); } catch { }
+        DetenerEscuchaContinua();
         _audioService?.StopRecording();
 
         MainThread.BeginInvokeOnMainThread(() => {
@@ -572,6 +583,120 @@ public partial class EstandarPage : ContentPage
 
             if (BarraProgreso != null) BarraProgreso.ProgressColor = Color.FromArgb("#243782");
         });
+    }
+
+    // Abre el micrófono (auriculares Bluetooth) UNA vez y lo deja escuchando en
+    // segundo plano durante toda la secuencia, habla incluida. Cada resultado
+    // reconocido de Vosk que case con un comando conocido se deja en
+    // _comandoContinuo listo para que EsperarComando lo recoja, y si en ese
+    // momento hay una frase sonando, se cancela _speechCts para cortarla al
+    // instante (barge-in) — nunca cancela _cts (el token maestro), así que la
+    // secuencia en sí no se detiene.
+    private async Task IniciarEscuchaContinua()
+    {
+        if (_escuchaContinuaActiva || _rec == null || _audioService == null) return;
+
+        // Sin permiso de micrófono o sin el modelo Vosk cargado, no hay nada que
+        // escuchar - la secuencia sigue funcionando igual, solo que avanzar
+        // depende únicamente de los botones físicos (comportamiento ya existente).
+        if (!await CheckSpeechPermissionsAsync() || !_modeloCargado) return;
+
+        _rec.Reset();
+        _comandoContinuo = "";
+        _escuchaContinuaActiva = true;
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var panelManual = this.FindByName<VisualElement>("PanelValidacionManual");
+            if (panelManual != null) panelManual.IsVisible = true;
+            if (BarraProgreso != null) BarraProgreso.ProgressColor = Color.FromArgb("#63F86D");
+        });
+        ReproducirBeep(esInicio: true);
+
+        _audioService.StartRecording((buffer, length) =>
+        {
+            if (!_escuchaContinuaActiva || _rec == null) return;
+
+            string comandoDetectado = "";
+            bool accepted = _rec.AcceptWaveform(buffer, length);
+            if (accepted)
+            {
+                string resultJson = _rec.Result();
+                procesarResultadoVosk(resultJson, ref comandoDetectado, esParcial: false);
+            }
+            else
+            {
+                string partialJson = _rec.PartialResult();
+                if (!string.IsNullOrWhiteSpace(partialJson) && !partialJson.Contains("\"partial\" : \"\""))
+                    procesarResultadoVosk(partialJson, ref comandoDetectado, esParcial: true);
+            }
+
+            if (!string.IsNullOrEmpty(comandoDetectado))
+            {
+                _comandoContinuo = comandoDetectado;
+                _rec.Reset(); // listo para reconocer el siguiente comando sin arrastrar nada del anterior
+                try { _speechCts?.Cancel(); } catch { } // barge-in: corta el habla en curso, si la hay
+            }
+        });
+    }
+
+    private void DetenerEscuchaContinua()
+    {
+        if (!_escuchaContinuaActiva) return;
+        _escuchaContinuaActiva = false;
+        _audioService?.StopRecording();
+    }
+
+    // Espera a que llegue un comando - por voz (la escucha continua ya está
+    // corriendo en segundo plano) o por un botón físico (_comandoForzado).
+    // Sustituye a la antigua EjecutarValidacionManual, que abría y cerraba el
+    // micrófono (y con él, Bluetooth SCO) en cada llamada.
+    private async Task<string> EsperarComando(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
+        {
+            string? comando = null;
+            if (_comandoForzado != null) { comando = _comandoForzado; _comandoForzado = null; }
+            else if (!string.IsNullOrEmpty(_comandoContinuo)) { comando = _comandoContinuo; _comandoContinuo = ""; }
+
+            if (comando != null)
+            {
+                if (comando != "pausa")
+                {
+                    await Task.Delay(150, token);
+                    ReproducirBeep(esInicio: false);
+                }
+                return comando;
+            }
+
+            await Task.Delay(50, token);
+        }
+        return "";
+    }
+
+    // Habla un texto de forma interrumpible: si mientras suena llega un comando
+    // por la escucha continua, _speechCts se cancela y esto vuelve sin más -
+    // el comando ya está listo en _comandoContinuo para que EsperarComando lo
+    // recoja de inmediato, sin esperar a que termine la frase.
+    private async Task HablarInterrumpible(string? texto, CancellationToken tokenMaestro)
+    {
+        if (string.IsNullOrWhiteSpace(texto)) return;
+
+        var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
+        _speechCts = CancellationTokenSource.CreateLinkedTokenSource(tokenMaestro);
+        try
+        {
+            await SpeechLocaleHelper.HablarConPausasAsync(texto, localeVoz, _speechCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            if (tokenMaestro.IsCancellationRequested) throw; // parada/pausa real de la secuencia: propaga
+            // si no, fue un barge-in - se ignora aquí, el comando ya está listo para procesarse
+        }
+        finally
+        {
+            _speechCts = null;
+        }
     }
 
     private async void IniciarSecuencia()
@@ -584,6 +709,10 @@ public partial class EstandarPage : ContentPage
 
         _estadoActual = EstadoApp.Corriendo;
         ActualizarBotonVisualmente();
+
+        // El micrófono se abre una sola vez para toda la secuencia (ver
+        // IniciarEscuchaContinua) en vez de en cada paso.
+        await IniciarEscuchaContinua();
 
         try
         {
@@ -606,11 +735,12 @@ public partial class EstandarPage : ContentPage
                 // completo (AudioAuditoria, o AudioFormacion en modo Formación) — solo
                 // se dice cuando el auditor lo pide, por voz ("detalle"/"detail") o
                 // tocando "Más Detalle": pensado para manos libres mientras se conduce.
+                // HablarInterrumpible deja que un comando de voz corte la frase al
+                // instante en vez de tener que esperar a que termine.
                 if (!string.IsNullOrWhiteSpace(paso.Fase))
                 {
                     await Task.Delay(500, token);
-                    var localeVoz = await SpeechLocaleHelper.GetLocaleAsync();
-                    await SpeechLocaleHelper.HablarConPausasAsync(paso.Fase, localeVoz, token);
+                    await HablarInterrumpible(paso.Fase, token);
                 }
 
                 if (token.IsCancellationRequested || _estadoActual != EstadoApp.Corriendo) break;
@@ -620,11 +750,17 @@ public partial class EstandarPage : ContentPage
                 string comandoVoz = "";
                 while (string.IsNullOrEmpty(comandoVoz) && !token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
                 {
-                    comandoVoz = await EjecutarValidacionManual(token);
+                    comandoVoz = await EsperarComando(token);
 
                     if (comandoVoz == "mas_detalle")
                     {
                         await MostrarYHablarDetalleAsync(textoDetalle, token);
+                        comandoVoz = ""; // seguir escuchando en el mismo paso
+                    }
+                    else if (comandoVoz == "requisito_test")
+                    {
+                        if (!_esFormacion && paso.TieneRequisitoTest)
+                            await MostrarRequisitoTest(paso.AudioFormacion);
                         comandoVoz = ""; // seguir escuchando en el mismo paso
                     }
                 }
@@ -658,91 +794,6 @@ public partial class EstandarPage : ContentPage
         finally { DetenerEjecucionAudioYVosk(); }
     }
 
-    private async Task<string> EjecutarValidacionManual(CancellationToken token)
-    {
-        string comandoDetectado = "";
-        _esperandoValidacionManual = true;
-        _comandoForzado = null;
-
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            var panelManual = this.FindByName<VisualElement>("PanelValidacionManual");
-            if (panelManual != null) panelManual.IsVisible = true;
-            if (BarraProgreso != null) BarraProgreso.ProgressColor = Color.FromArgb("#63F86D");
-        });
-
-        if (await CheckSpeechPermissionsAsync() && _modeloCargado && _rec != null && _audioService != null)
-        {
-            _rec.Reset();
-
-            ReproducirBeep(esInicio: true);
-            await Task.Delay(700, token);
-
-            _audioService.StartRecording((buffer, length) =>
-            {
-                if (!_esperandoValidacionManual || token.IsCancellationRequested || !string.IsNullOrEmpty(comandoDetectado))
-                    return;
-
-                bool accepted = _rec.AcceptWaveform(buffer, length);
-
-                if (accepted)
-                {
-                    string resultJson = _rec.Result();
-                    procesarResultadoVosk(resultJson, ref comandoDetectado, esParcial: false);
-                }
-                else
-                {
-                    string partialJson = _rec.PartialResult();
-                    if (!string.IsNullOrWhiteSpace(partialJson) && !partialJson.Contains("\"partial\" : \"\""))
-                    {
-                        procesarResultadoVosk(partialJson, ref comandoDetectado, esParcial: true);
-                    }
-                }
-            });
-
-            while (_esperandoValidacionManual && !token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
-            {
-                if (_comandoForzado != null)
-                {
-                    comandoDetectado = _comandoForzado;
-                    _comandoForzado = null;
-                    _esperandoValidacionManual = false;
-                    break;
-                }
-
-                await Task.Delay(50, token);
-            }
-
-            _audioService.StopRecording();
-
-            if (!string.IsNullOrEmpty(comandoDetectado) && comandoDetectado != "pausa")
-            {
-                await Task.Delay(200, token);
-                ReproducirBeep(esInicio: false);
-                await Task.Delay(200, token);
-            }
-        }
-        else
-        {
-            // Sin micrófono/modelo Vosk disponible, los botones físicos son la
-            // única forma de avanzar, así que deben seguir funcionando igual.
-            while (_esperandoValidacionManual && !token.IsCancellationRequested && _estadoActual == EstadoApp.Corriendo)
-            {
-                if (_comandoForzado != null)
-                {
-                    comandoDetectado = _comandoForzado;
-                    _comandoForzado = null;
-                    _esperandoValidacionManual = false;
-                    break;
-                }
-
-                await Task.Delay(200, token);
-            }
-        }
-
-        return comandoDetectado;
-    }
-
     private void procesarResultadoVosk(string json, ref string comando, bool esParcial)
     {
         try
@@ -772,11 +823,6 @@ public partial class EstandarPage : ContentPage
                     Debug.WriteLine($"✅ COMANDO CAZADO: {cmd}");
                     break;
                 }
-            }
-
-            if (!string.IsNullOrEmpty(comando))
-            {
-                _esperandoValidacionManual = false;
             }
         }
         catch (Exception ex)

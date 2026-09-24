@@ -9,6 +9,57 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.9.1] - 2026-09-24 — Claude (asistencia)
+
+### AÑADIDO — Comando de voz "Requisito de la prueba"
+- Se puede pedir el "Requisito de la prueba" (v1.9.0) diciendo "requisito"/
+  "requisitos" (ES) o "requirement"/"test requirement" (EN), igual que
+  "detalle"/"detail" ya abría el detalle. Se comporta como "Más Detalle":
+  se queda en el mismo paso escuchando el siguiente comando.
+
+### CAMBIADO — Escucha continua: el micrófono ya no se cierra entre pasos
+- **Causa raíz de dos quejas reales**: (1) había que esperar a que la app
+  terminara de hablar antes de que el micrófono empezara a escuchar
+  (`EjecutarValidacionManual` solo arrancaba DESPUÉS de que `await
+  HablarConPausasAsync(...)` devolviera el control); (2) a veces había que
+  repetir el comando — cada apertura del micrófono reconectaba Bluetooth
+  SCO desde cero (`AudioCaptureService.StartRecording`) y solo esperaba
+  700ms fijos antes de empezar a grabar; si la negociación real tardaba
+  más (frecuente con SCO), se perdía el principio de la frase.
+- **Arreglo**: el micrófono (auriculares Bluetooth) se abre **una sola vez**
+  al arrancar la secuencia (`IniciarEscuchaContinua`) y se queda escuchando
+  en segundo plano durante toda ella — habla incluida — en vez de abrirse y
+  cerrarse en cada paso. Un comando reconocido en cualquier momento
+  (`_comandoContinuo`) corta la frase que esté sonando al instante
+  (`_speechCts`, un token distinto del de toda la secuencia) sin esperar a
+  que termine — se puede decir "siguiente", "pausa", "detalle", etc. en
+  mitad de la frase hablada. Con auriculares Bluetooth (confirmado como el
+  hardware real usado) esto es seguro: el micro no oye lo que suena en el
+  oído, así que no hay eco ni falsos positivos por esa vía.
+- `EjecutarValidacionManual` (abría/cerraba el micrófono en cada llamada)
+  se ha eliminado, sustituido por `EsperarComando` (solo espera, el
+  micrófono ya está escuchando) y `HablarInterrumpible` (habla con opción
+  a cortarse). El botón físico "Validar y Continuar" y los comandos por
+  voz comparten exactamente el mismo camino que antes.
+- Aviso real de esta escucha "siempre encendida": al estar activa todo el
+  rato (no solo en una ventana breve tras un pitido), es más sensible a
+  ruido ambiente si no se usan auriculares — con el micrófono integrado de
+  la tablet u otro sin aislar de la boca del auditor, un comando podría
+  dispararse por error. Con auriculares Bluetooth cerca de la boca no
+  debería ser un problema real.
+- Sin cambios en: el listado de comandos reconocidos en sí (mismas
+  palabras que ya existían, más "requisito_test"), los botones físicos
+  ⏮/⏭ (no pasan por este camino, son un salto manual aparte), ni la
+  lógica de sección/Requisito de la prueba de v1.9.0.
+- Verificado en tablet física: la secuencia arranca sin errores, el botón
+  físico "Validar y Continuar" (mismo camino que un comando de voz)
+  avanza correctamente de paso 1 a paso 2 con el panel de escucha visible
+  de forma continua, y "Requisito de la prueba" se muestra correctamente
+  para "Switch to Client mode". **Pendiente de verificar con voz real y
+  auriculares Bluetooth reales** — la interrupción a mitad de frase
+  (barge-in) no se puede probar por adb, solo revisando el código y
+  probando el camino equivalente por botón físico.
+
 ## [1.9.0] - 2026-09-24 — Claude (asistencia)
 
 ### AÑADIDO — Jerarquía de secciones en el Excel de CDPV → MACK
