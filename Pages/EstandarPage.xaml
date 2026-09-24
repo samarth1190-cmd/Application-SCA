@@ -168,12 +168,34 @@
                                 <Border.Content>
                                     <VerticalStackLayout Spacing="15">
 
-                                        <Border BackgroundColor="#E3F2FD" StrokeThickness="0" HorizontalOptions="Center" Padding="15,5" Margin="10">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="12"/>
-                                            </Border.StrokeShape>
-                                            <Label x:Name="LblPasoActual" Text="Paso 0 de 0" TextColor="#1565C0" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
-                                        </Border>
+                                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" Margin="10,10,10,0">
+                                            <Border BackgroundColor="#E3F2FD" StrokeThickness="0" Padding="15,5">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="12"/>
+                                                </Border.StrokeShape>
+                                                <Label x:Name="LblPasoActual" Text="Paso 0 de 0" TextColor="#1565C0" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                            </Border>
+
+                                            <Border x:Name="BtnRequisitoTest"
+                                                    IsVisible="False"
+                                                    BackgroundColor="#FFF6E9"
+                                                    StrokeThickness="1.4"
+                                                    Stroke="#E0A233"
+                                                    Padding="13,5">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="12"/>
+                                                </Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Tapped="OnRequisitoTestClicked"/>
+                                                </Border.GestureRecognizers>
+                                                <Border.Content>
+                                                    <HorizontalStackLayout Spacing="6">
+                                                        <Label Text="&#9888;&#65039;" FontSize="12" VerticalOptions="Center"/>
+                                                        <Label x:Name="LblRequisitoTestTexto" Text="TEST REQUIREMENT" TextColor="#9A6414" FontSize="11" FontAttributes="Bold" VerticalOptions="Center" CharacterSpacing="0.3"/>
+                                                    </HorizontalStackLayout>
+                                                </Border.Content>
+                                            </Border>
+                                        </HorizontalStackLayout>
 
                                         <Grid ColumnDefinitions="*, Auto, *" ColumnSpacing="10" VerticalOptions="Center">
 
@@ -266,6 +288,33 @@
 
                             <ScrollView Grid.Row="2" x:Name="ScrollInstrucciones" Margin="0,0,0,0" VerticalScrollBarVisibility="Never">
                                 <VerticalStackLayout x:Name="ContenedorInstruccionActual" Spacing="12" Padding="5,0,5,10">
+
+                                    <Border x:Name="BorderSeccion"
+                                            BackgroundColor="#EEF0F8"
+                                            StrokeThickness="0"
+                                            HorizontalOptions="Center"
+                                            Padding="16,7"
+                                            Margin="0,0,0,2">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                                            <Label x:Name="LblSeccionEtiqueta"
+                                                   Text="SECCIÓN"
+                                                   TextColor="#6B76A0"
+                                                   FontSize="10"
+                                                   FontAttributes="Bold"
+                                                   CharacterSpacing="1.6"
+                                                   HorizontalTextAlignment="Center"/>
+                                            <Label x:Name="LblSeccionActual"
+                                                   Text="..."
+                                                   TextColor="#243782"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="WordWrap"
+                                                   HorizontalTextAlignment="Center"/>
+                                        </VerticalStackLayout>
+                                    </Border>
 
                                     <Label x:Name="LblFaseTitulo"
                                            Text="..."

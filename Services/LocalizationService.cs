@@ -1072,6 +1072,18 @@ namespace Aplicacion_SCA.Services
                 { Language.French, "PLUS DE DÉTAILS" },
                 { Language.German, "MEHR DETAILS" }
             } },
+            { "LBL_SECCION", new() {
+                { Language.Spanish, "SECCIÓN" },
+                { Language.English, "SECTION" },
+                { Language.French, "SECTION" },
+                { Language.German, "ABSCHNITT" }
+            } },
+            { "BTN_REQUISITO_TEST", new() {
+                { Language.Spanish, "REQUISITO DE LA PRUEBA" },
+                { Language.English, "TEST REQUIREMENT" },
+                { Language.French, "EXIGENCE DE TEST" },
+                { Language.German, "TESTANFORDERUNG" }
+            } },
             { "BTN_OCULTAR_DETALLE", new() {
                 { Language.Spanish, "OCULTAR DETALLE" },
                 { Language.English, "HIDE DETAIL" },

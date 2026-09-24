@@ -45,10 +45,23 @@ namespace Aplicacion_SCA.Services
             return valorEspanol;
         }
 
+        // Cabecera de sección = la celda de la columna B ("Fase") tiene un relleno de
+        // color (verificado contra el Excel real de MACK: las ~40 filas de sección
+        // llevan Theme/Accent1, el resto de filas no llevan ningún relleno -Indexed
+        // 64, "automático"-). No se basa en el texto ni en ninguna columna extra, así
+        // que sigue funcionando aunque cambien los nombres de sección de un Excel a
+        // otro - la única señal es el propio formato de la celda.
+        private static bool EsFilaDeSeccion(IXLWorksheet ws, int fila)
+        {
+            var fill = ws.Cell(fila, 2).Style.Fill.BackgroundColor;
+            return fill.ColorType != XLColorType.Indexed || fill.Indexed != 64;
+        }
+
         public List<Estandar> LeerExcelAuditoria(Stream archivoStream)
         {
             var listaEstandares = new List<Estandar>();
             var mapaPorNombreEs = new Dictionary<string, Estandar>();
+            var seccionPorEstandar = new Dictionary<string, string>();
 
             using (var workbook = new XLWorkbook(archivoStream))
             {
@@ -74,6 +87,16 @@ namespace Aplicacion_SCA.Services
                         listaEstandares.Add(estandarActual);
                     }
 
+                    // Cabecera de sección: guarda el nombre para las filas siguientes de
+                    // este mismo estándar y pasa a la fila siguiente sin crear ningún
+                    // ControlFase - nunca cuenta como paso ejecutable ni se habla.
+                    if (EsFilaDeSeccion(worksheet, fila))
+                    {
+                        seccionPorEstandar[nombreEstandarEs] = worksheet.Cell(fila, 2).GetString().Trim();
+                        fila++;
+                        continue;
+                    }
+
                     int.TryParse(worksheet.Cell(fila, 7).GetString().Trim(), out int valTermico);
                     int.TryParse(worksheet.Cell(fila, 8).GetString().Trim(), out int valHibrido);
                     int.TryParse(worksheet.Cell(fila, 9).GetString().Trim(), out int valElectrico);
@@ -97,6 +120,7 @@ namespace Aplicacion_SCA.Services
                     {
                         NumeroFase = estandarActual.ListaControles.Count + 1,
                         Fase = worksheet.Cell(fila, 2).GetString().Trim(),
+                        Seccion = seccionPorEstandar.GetValueOrDefault(nombreEstandarEs, string.Empty),
 
                         AudioFormacion = TextoLocalizado(worksheet, fila, cabeceras, "AudioFormacion", sufijo, worksheet.Cell(fila, 3).GetString()),
                         TiempoFormacion = worksheet.Cell(fila, 4).GetString(),

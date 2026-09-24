@@ -9,6 +9,69 @@ Tipos: AÑADIDO / CAMBIADO / CORREGIDO / ELIMINADO
 
 ---
 
+## [1.9.0] - 2026-09-24 — Claude (asistencia)
+
+### AÑADIDO — Jerarquía de secciones en el Excel de CDPV → MACK
+- El Excel `CDPV_MACK.xlsx` marca ~40 filas como **cabecera de sección** con un
+  relleno de color en la columna B (Fase) — p. ej. "Vehicle preparation",
+  "Driver seat position - from outside". `ExcelService.LeerExcelAuditoria`
+  ahora detecta esas filas por su formato (no por texto, así que no depende
+  de nombres concretos) y **ya no las convierte en un paso ejecutable**: en
+  vez de eso, guarda el nombre y lo asocia a todos los pasos reales que
+  vienen después, hasta la siguiente cabecera de sección.
+- `ControlFase.Seccion` (nuevo campo) lleva ese nombre a cada paso real.
+  `EstandarPage` lo muestra como una píldora "SECCIÓN" justo encima del
+  título del paso, con un pulso breve cuando el paso actual entra en una
+  sección distinta a la del paso anterior.
+- Efecto secundario correcto: como las cabeceras de sección ya no cuentan
+  como paso, "Paso X de Y" y el % de progreso (v1.8.7) reflejan solo pasos
+  reales. Ejemplo verificado: STATIC pasa de 140 a **124** pasos (140 filas
+  − 16 cabeceras de sección dentro de esa fase). Ningún cambio de código en
+  `AuditProgressHelper` ni en `MenuEstandarPage` — leen la misma lista, que
+  ahora ya viene correcta desde `ExcelService`.
+
+### AÑADIDO — Botón "Requisito de la prueba"
+- La columna C (AudioFormacion) del Excel, en las filas de paso real (no de
+  sección), a veces trae una nota adicional — herramienta a usar, condición
+  previa, zona de inspección — distinta del texto de auditoría (columna E).
+  Ejemplo real: para "Switch to 'Client' mode", la columna C trae "Based on
+  plant availability & project / EE architecture: - CDA/wiTech/Dianalyzer
+  IT tool - DSA tool - Internal routine with physical buttons".
+- Nuevo botón "TEST REQUIREMENT" junto al contador de paso, visible **solo**
+  cuando esa columna tiene contenido real para el paso actual — vacío o
+  literal "0" no cuenta (225 de 361 pasos reales del Excel de MACK tienen
+  contenido; el resto no muestra el botón). Al tocarlo, una hoja inferior
+  (bottom sheet) muestra el texto completo con un botón "CERRAR".
+- Solo aparece en el flujo de auditoría normal, no en modo "Formación SCA"
+  (ahí la columna C ya es el texto principal que se muestra/habla; mostrarla
+  también como "requisito" sería redundante).
+- `ControlFase.TieneRequisitoTest` centraliza la regla vacío/"0"/con
+  contenido para que la UI no tenga que repetirla.
+
+### CAMBIADO — Excel de producción de MACK actualizado
+- `_ExcelSharePoint/MACK/CDPV.xlsx` reemplazado por la versión con formato de
+  secciones (`CDPV_MACK.xlsx` proporcionado para esta tarea) y subido a
+  SharePoint (`02_Datos_App_MACK/05_CDPV_Formacion/CDPV.xlsx`), sustituyendo
+  al anterior. Copia de seguridad del archivo previo (tanto la copia local
+  como la que estaba realmente en SharePoint) en
+  `_ExcelSharePoint/MACK/_backup/`.
+- Verificado con una descarga de vuelta desde SharePoint tras la subida:
+  mismas 402 filas, mismas 40 cabeceras de sección — la subida no corrompió
+  el archivo.
+
+### Alcance de este cambio
+- Solo toca `ControlFase.cs`, `ExcelService.LeerExcelAuditoria` (el parser de
+  13 columnas compartido por Vigo y MACK — para Vigo es un no-op si su Excel
+  no tiene ninguna fila con ese formato) y `EstandarPage`. Login, selección
+  de planta/vehículo/motor, RodajeExterior, DPV, Control Japón, RRU, y la
+  lógica de envío de resultados no se han tocado.
+- Verificado en tablet física de principio a fin: C-DPV → MACK → WD/GAS →
+  STATIC → "Step 1 of 124" (antes 140) → sección "Vehicle preparation" →
+  paso 2 con botón TEST REQUIREMENT (contenido correcto en la hoja inferior)
+  → transición de sección correcta en el paso 8 ("Driver seat position -
+  from outside") → 0 errores/crashes en logcat al iniciar la secuencia de
+  audio.
+
 ## [1.8.7] - 2026-09-04 — Claude (asistencia)
 
 ### AÑADIDO — Porcentaje de progreso por fase en MenuEstandarPage

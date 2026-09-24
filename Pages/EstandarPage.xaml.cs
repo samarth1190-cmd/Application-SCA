@@ -37,6 +37,11 @@ public partial class EstandarPage : ContentPage
     private string _nombreEstandarActual = "";
     private int _miIndiceEstandar;
 
+    // Última sección mostrada, para saber si el paso actual entra en una
+    // sección distinta a la del paso anterior (dispara la animación de
+    // "cambio de sección" en ActualizarInstruccionActual).
+    private string _seccionAnterior = string.Empty;
+
     private bool _esperandoValidacionManual = false;
     private bool _bloqueoAccion = false;
 
@@ -352,10 +357,22 @@ public partial class EstandarPage : ContentPage
         if (_pasosReales == null || _indiceActual >= _pasosReales.Count) return;
         var paso = _pasosReales[_indiceActual];
 
+        LblSeccionEtiqueta.Text = LocalizationService.Translate("LBL_SECCION");
+        LblSeccionActual.Text = !string.IsNullOrWhiteSpace(paso.Seccion) ? paso.Seccion : _nombreEstandarActual;
+        BorderSeccion.IsVisible = !string.IsNullOrWhiteSpace(paso.Seccion);
+
+        bool cambioSeccion = !string.IsNullOrEmpty(_seccionAnterior) &&
+                              !string.Equals(_seccionAnterior, paso.Seccion, StringComparison.Ordinal);
+        _seccionAnterior = paso.Seccion;
+        if (cambioSeccion) _ = AnimarCambioSeccion();
+
         LblFaseTitulo.Text = !string.IsNullOrWhiteSpace(paso.Fase) ? paso.Fase : _nombreEstandarActual;
 
         LblInstruccionActual.Text = string.Empty;
         LblInstruccionActual.IsVisible = false;
+
+        LblRequisitoTestTexto.Text = LocalizationService.Translate("BTN_REQUISITO_TEST");
+        BtnRequisitoTest.IsVisible = !_esFormacion && paso.TieneRequisitoTest;
 
         BtnMasDetalle.IsVisible = !string.IsNullOrWhiteSpace(TextoDetalleDelPaso(paso));
         LblMasDetalleTexto.Text = LocalizationService.Translate("BTN_MAS_DETALLE");
@@ -369,6 +386,17 @@ public partial class EstandarPage : ContentPage
         // escuchando el micrófono en este momento, se trata exactamente igual
         // que si el auditor lo hubiera dicho en voz alta.
         _comandoForzado = "mas_detalle";
+    }
+
+    private async void OnRequisitoTestClicked(object? sender, TappedEventArgs e)
+    {
+        if (sender is VisualElement btn) await AnimarBoton(btn);
+        if (_pasosReales == null || _indiceActual >= _pasosReales.Count) return;
+
+        var paso = _pasosReales[_indiceActual];
+        if (!paso.TieneRequisitoTest) return;
+
+        await MostrarRequisitoTest(paso.AudioFormacion);
     }
 
     private async Task MostrarYHablarDetalleAsync(string textoDetalle, CancellationToken token)
@@ -394,6 +422,25 @@ public partial class EstandarPage : ContentPage
         if (boton == null) return;
         await boton.ScaleTo(0.95, 50, Easing.Linear);
         await boton.ScaleTo(1.0, 50, Easing.Linear);
+    }
+
+    // Llamado solo cuando el paso actual entra en una sección distinta a la del
+    // paso anterior (nunca en la primera carga): un pulso breve en la píldora
+    // de sección para que el cambio sea obvio sin interrumpir el flujo con una
+    // pantalla intermedia.
+    private async Task AnimarCambioSeccion()
+    {
+        if (BorderSeccion == null) return;
+        try
+        {
+            await BorderSeccion.ScaleTo(1.08, 120, Easing.CubicOut);
+            _ = BorderSeccion.FadeTo(0.55, 120);
+            await Task.WhenAll(
+                BorderSeccion.ScaleTo(1.0, 160, Easing.CubicIn),
+                BorderSeccion.FadeTo(1.0, 220)
+            );
+        }
+        catch { }
     }
 
     private async void OnAnteriorClicked(object sender, TappedEventArgs e)
@@ -875,6 +922,105 @@ public partial class EstandarPage : ContentPage
 
         _ = VolverAtrasSinGuardar();
         return true;
+    }
+
+    // Bottom sheet con el contenido de AudioFormacion para el paso actual (el
+    // "Requisito de la prueba"). Mismo patrón de overlay programático que
+    // PedirConfirmacionConTimeout, para mantener el mismo lenguaje visual en
+    // toda la página, pero anclado abajo y sin temporizador: aquí no hay
+    // ninguna decisión que tomar, solo información que leer y cerrar.
+    private async Task MostrarRequisitoTest(string contenido)
+    {
+        var rootGrid = this.Content as Grid;
+        if (rootGrid == null || string.IsNullOrWhiteSpace(contenido)) return;
+
+        var tcs = new TaskCompletionSource<bool>();
+
+        var overlay = new Grid { BackgroundColor = Color.FromArgb("#B3000000"), ZIndex = 9999, Opacity = 0 };
+        overlay.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(() => tcs.TrySetResult(true)) });
+
+        var hoja = new Border
+        {
+            BackgroundColor = Colors.White,
+            HorizontalOptions = LayoutOptions.Fill,
+            VerticalOptions = LayoutOptions.End,
+            Margin = new Thickness(0),
+            Padding = new Thickness(25, 22, 25, 30),
+            StrokeThickness = 0,
+            TranslationY = 400
+        };
+        hoja.StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(24, 24, 0, 0) };
+
+        var layout = new VerticalStackLayout { Spacing = 14 };
+
+        var manija = new Border
+        {
+            BackgroundColor = Color.FromArgb("#DDE1E8"),
+            WidthRequest = 42,
+            HeightRequest = 5,
+            StrokeThickness = 0,
+            HorizontalOptions = LayoutOptions.Center
+        };
+        manija.StrokeShape = new RoundRectangle { CornerRadius = 3 };
+        layout.Children.Add(manija);
+
+        layout.Children.Add(new Label
+        {
+            Text = "⚠️  " + LocalizationService.Translate("BTN_REQUISITO_TEST"),
+            FontAttributes = FontAttributes.Bold,
+            FontSize = 17,
+            TextColor = Color.FromArgb("#9A6414"),
+            HorizontalTextAlignment = TextAlignment.Start
+        });
+
+        var scroll = new ScrollView { MaximumHeightRequest = 320 };
+        scroll.Content = new Label
+        {
+            Text = contenido,
+            FontSize = 16,
+            LineHeight = 1.35,
+            TextColor = Color.FromArgb("#263238")
+        };
+        layout.Children.Add(scroll);
+
+        var btnCerrar = new Border
+        {
+            BackgroundColor = Color.FromArgb("#243782"),
+            HeightRequest = 48,
+            StrokeThickness = 0,
+            HorizontalOptions = LayoutOptions.Fill,
+            Margin = new Thickness(0, 6, 0, 0)
+        };
+        btnCerrar.StrokeShape = new RoundRectangle { CornerRadius = 24 };
+        btnCerrar.Content = new Label
+        {
+            Text = LocalizationService.Translate("BTN_CERRAR"),
+            TextColor = Colors.White,
+            FontAttributes = FontAttributes.Bold,
+            FontSize = 14,
+            CharacterSpacing = 1,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center
+        };
+        btnCerrar.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(() => tcs.TrySetResult(true)) });
+        layout.Children.Add(btnCerrar);
+
+        hoja.Content = layout;
+        overlay.Children.Add(hoja);
+
+        rootGrid.Children.Add(overlay);
+        await Task.WhenAll(
+            overlay.FadeTo(1, 220),
+            hoja.TranslateTo(0, 0, 260, Easing.CubicOut)
+        );
+
+        await tcs.Task;
+
+        await Task.WhenAll(
+            overlay.FadeTo(0, 180),
+            hoja.TranslateTo(0, 400, 200, Easing.CubicIn)
+        );
+        rootGrid.Children.Remove(overlay);
     }
 
     private async Task<bool> PedirConfirmacionConTimeout(string titulo, string mensaje)
